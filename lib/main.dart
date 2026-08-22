@@ -85,11 +85,11 @@ class DeviseMock {
 // ============================================================
 
 final List<ChauffeurMock> chauffeursMock = [
-  const ChauffeurMock(nom: "Jean-Paul E.", note: 4.9, plaque: "LT 3421 CE", vehicule: "Toyota Corolla Blanche", couleurAvatar: Color(0xFF0E3A3E), icone: Icons.person, creneau: "Jour", actif: true, coursesDuJour: 12),
-  const ChauffeurMock(nom: "Aïssatou B.", note: 4.8, plaque: "CE 8912 LT", vehicule: "Honda Civic Grise", couleurAvatar: Color(0xFF1B7A6B), icone: Icons.person_3, creneau: "Nuit", actif: true, coursesDuJour: 8),
-  const ChauffeurMock(nom: "Samuel K.", note: 4.7, plaque: "NO 1123 AD", vehicule: "Kia Rio Bleue", couleurAvatar: Color(0xFFFF6B35), icone: Icons.person_4, creneau: "Jour", actif: true, coursesDuJour: 10),
-  const ChauffeurMock(nom: "Fatima N.", note: 4.9, plaque: "SW 7788 CE", vehicule: "Hyundai i10 Rouge", couleurAvatar: Color(0xFF6C5CE7), icone: Icons.person_2, creneau: "Jour", actif: false, coursesDuJour: 7),
-  const ChauffeurMock(nom: "Emmanuel T.", note: 4.6, plaque: "OU 5541 LT", vehicule: "Suzuki Swift Blanche", couleurAvatar: Color(0xFFE17055), icone: Icons.person, creneau: "Nuit", actif: true, coursesDuJour: 15),
+  ChauffeurMock(nom: "Jean-Paul E.", note: 4.9, plaque: "LT 3421 CE", vehicule: "Toyota Corolla Blanche", couleurAvatar: Color(0xFF0E3A3E), icone: Icons.person, creneau: "Jour", actif: true, coursesDuJour: 8),
+  ChauffeurMock(nom: "Aïssatou B.", note: 4.8, plaque: "CE 8912 LT", vehicule: "Honda Civic Grise", couleurAvatar: Color(0xFF1B7A6B), icone: Icons.person_3, creneau: "Nuit", actif: true, coursesDuJour: 5),
+  ChauffeurMock(nom: "Samuel K.", note: 4.7, plaque: "NO 1123 AD", vehicule: "Kia Rio Bleue", couleurAvatar: Color(0xFFFF6B35), icone: Icons.person_4, creneau: "Jour", actif: true, coursesDuJour: 11),
+  ChauffeurMock(nom: "Fatima N.", note: 4.9, plaque: "SW 7788 CE", vehicule: "Hyundai i10 Rouge", couleurAvatar: Color(0xFF6C5CE7), icone: Icons.person_2, creneau: "Jour", actif: false, coursesDuJour: 0),
+  ChauffeurMock(nom: "Emmanuel T.", note: 4.6, plaque: "OU 5541 LT", vehicule: "Suzuki Swift Blanche", couleurAvatar: Color(0xFFE17055), icone: Icons.person, creneau: "Nuit", actif: true, coursesDuJour: 3),
 ];
 
 final List<CourseMock> historiqueMock = [
@@ -147,9 +147,9 @@ class VTCAfriqueApp extends StatelessWidget {
           elevation: 0,
           centerTitle: true,
         ),
-        cardTheme: const CardThemeData(
+        cardTheme: CardThemeData(
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)), side: BorderSide(color: Color(0xFFE0E0E0))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade200)),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
@@ -209,6 +209,7 @@ class _RacineAppState extends State<RacineApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Barre haute avec sélecteur de rôle (exigence)
       appBar: AppBar(
         title: const Text("VTC Afrique • Douala", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
         bottom: PreferredSize(
@@ -270,11 +271,8 @@ class _RacineAppState extends State<RacineApp> {
           onDeviseChange: (d) => setState(() => deviseSelectionnee = d),
           formatMontant: formatMontant,
           onSoldeChange: (delta) {
-            if (delta > 0) {
-              ajouterSolde(delta);
-            } else {
-              debiterSolde(-delta);
-            }
+            if (delta > 0) ajouterSolde(delta);
+            else debiterSolde(-delta);
           },
         );
       case RoleApp.chauffeur:
@@ -322,9 +320,10 @@ class _RacineAppState extends State<RacineApp> {
 }
 
 // ============================================================
-// SECTION 5 - MODE PASSAGER
+// SECTION 5 - MODE PASSAGER (PRIORITAIRE ET LE PLUS DETAILLE)
 // ============================================================
 
+// Etapes du flux de commande
 enum EtapePassager { accueil, estimation, walletCheck, suivi, fin }
 
 class PassagerRoot extends StatefulWidget {
@@ -345,6 +344,7 @@ class _PassagerRootState extends State<PassagerRoot> {
   String depart = "Akwa, Douala";
   String destination = "";
   int prixBase = 2500;
+  // Majorations simulées
   bool majorationHeurePointe = true;
   bool majorationPluie = true;
   bool majorationTrafic = false;
@@ -379,34 +379,477 @@ class _PassagerRootState extends State<PassagerRoot> {
 
   @override
   Widget build(BuildContext context) {
+    // Navigation par onglets passager
     if (widget.index == 1) return WalletPassager(soldeFCFA: widget.soldeFCFA, devise: widget.devise, onDeviseChange: widget.onDeviseChange, formatMontant: widget.formatMontant, onSoldeChange: widget.onSoldeChange);
     if (widget.index == 2) return HistoriquePassager(formatMontant: widget.formatMontant);
     if (widget.index == 3) return const ProfilPassager();
 
+    // Onglet Accueil = flux de commande
     switch (etape) {
       case EtapePassager.accueil:
-        return const EcranPlaceholder("Accueil Passager");
+        return EcranAccueilPassager(
+          depart: depart,
+          destCtrl: destCtrl,
+          chauffeurActuel: chauffeurActuel,
+          onCommander: (dest) {
+            if (dest.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Entre une destination (ex: Bonapriso)")));
+              return;
+            }
+            setState(() {
+              destination = dest;
+              // Aléatoire simulé pour varier la démo
+              prixBase = 2200 + (dest.length * 110) % 1500;
+              etape = EtapePassager.estimation;
+            });
+          },
+        );
       case EtapePassager.estimation:
-        return const EcranPlaceholder("Estimation");
+        return EcranEstimation(
+          depart: depart,
+          arrivee: destination,
+          prixBase: prixBase,
+          supplement: supplement,
+          prixTotal: prixTotal,
+          majorationHeurePointe: majorationHeurePointe,
+          majorationPluie: majorationPluie,
+          majorationTrafic: majorationTrafic,
+          onMajHeurePointe: (v) => setState(() => majorationHeurePointe = v),
+          onMajPluie: (v) => setState(() => majorationPluie = v),
+          onMajTrafic: (v) => setState(() => majorationTrafic = v),
+          formatMontant: widget.formatMontant,
+          onConfirmer: () => setState(() => etape = EtapePassager.walletCheck),
+          onRetour: () => setState(() => etape = EtapePassager.accueil),
+        );
       case EtapePassager.walletCheck:
-        return const EcranPlaceholder("Vérification Wallet");
+        return EcranWalletCheck(
+          prixTotal: prixTotal,
+          solde: widget.soldeFCFA,
+          formatMontant: widget.formatMontant,
+          onPayer: () {
+            widget.onSoldeChange(-prixTotal);
+            // Chauffeur aléatoire
+            chauffeurActuel = (chauffeursMock..shuffle()).first;
+            setState(() => etape = EtapePassager.suivi);
+            lancerSuivi();
+          },
+          onCreditUrgence: () {
+            // Simule crédit d'urgence : on débite quand même mais affiche badge
+            widget.onSoldeChange(-prixTotal);
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Crédit d'urgence utilisé (-1200 FCFA de frais) - Course lancée !"), backgroundColor: Color(0xFF0E3A3E)));
+            chauffeurActuel = chauffeursMock[1];
+            setState(() => etape = EtapePassager.suivi);
+            lancerSuivi();
+          },
+          onRecharger: () {
+            // Redirige vers wallet
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recharge ton Wallet d'abord")));
+          },
+          onRetour: () => setState(() => etape = EtapePassager.estimation),
+        );
       case EtapePassager.suivi:
-        return const EcranPlaceholder("Suivi Course");
+        return EcranSuiviCourse(
+          depart: depart,
+          arrivee: destination,
+          chauffeur: chauffeurActuel,
+          progression: progressionSuivi,
+          onSOS: () => showDialog(context: context, builder: (_) => AlertDialog(title: const Text("SOS - Urgence"), content: const Text("Signal envoyé au centre de sécurité VTC Afrique Douala.\nUn opérateur te rappelle dans 60 secondes.\nPosition partagée: Akwa - Bonapriso."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))])),
+          onArriveeForcee: () {
+            timerSuivi?.cancel();
+            setState(() => etape = EtapePassager.fin);
+          },
+        );
       case EtapePassager.fin:
-        return const EcranPlaceholder("Fin Course");
+        return EcranFinCourse(
+          depart: depart,
+          arrivee: destination,
+          prix: prixTotal,
+          chauffeur: chauffeurActuel,
+          noteDonnee: noteDonnee,
+          onNote: (n) => setState(() => noteDonnee = n),
+          formatMontant: widget.formatMontant,
+          onTerminer: () => setState(() {
+            etape = EtapePassager.accueil;
+            noteDonnee = 0;
+            progressionSuivi = 0;
+            destCtrl.clear();
+          }),
+        );
     }
   }
 }
 
-class EcranPlaceholder extends StatelessWidget {
-  final String titre;
-  const EcranPlaceholder(this.titre, {super.key});
+// -------- Ecran Accueil Passager : Carte simulée + recherche --------
+class EcranAccueilPassager extends StatelessWidget {
+  final String depart;
+  final TextEditingController destCtrl;
+  final ChauffeurMock chauffeurActuel;
+  final Function(String) onCommander;
+  const EcranAccueilPassager({super.key, required this.depart, required this.destCtrl, required this.chauffeurActuel, required this.onCommander});
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text(titre, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)));
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Carte simulée (Container dégradé + formes)
+        CarteSimulee(hauteur: 220, showCar: false),
+        const SizedBox(height: 12),
+        Row(children: [Icon(Icons.location_on, size: 14, color: Colors.grey.shade600), const SizedBox(width: 6), Text("Position actuelle: $depart • Douala, Cameroun", style: TextStyle(fontSize: 12, color: Colors.grey.shade600))]),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text("Où vas-tu ?", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+              const SizedBox(height: 12),
+              TextField(enabled: false, decoration: InputDecoration(prefixIcon: const Icon(Icons.my_location, size: 18), hintText: depart, filled: true, fillColor: const Color(0xFFF6F7F6), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none))),
+              const SizedBox(height: 10),
+              TextField(controller: destCtrl, decoration: InputDecoration(prefixIcon: const Icon(Icons.search, color: Color(0xFFFF6B35)), hintText: "Saisis ta destination (ex: Bonapriso, Makepe...)", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6B35), width: 1.5)))),
+              const SizedBox(height: 10),
+              Wrap(spacing: 8, children: [
+                ActionChip(label: const Text("Bonapriso"), onPressed: () => destCtrl.text = "Bonapriso"),
+                ActionChip(label: const Text("Bonamoussadi"), onPressed: () => destCtrl.text = "Bonamoussadi"),
+                ActionChip(label: const Text("Aéroport"), onPressed: () => destCtrl.text = "Aéroport Douala"),
+                ActionChip(label: const Text("Makepe"), onPressed: () => destCtrl.text = "Makepe"),
+              ]),
+              const SizedBox(height: 16),
+              SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: () => onCommander(destCtrl.text), icon: const Icon(Icons.bolt), label: const Text("Commander maintenant"))),
+              const SizedBox(height: 8),
+              Center(child: Text("Estimation instantanée • Paiement Mobile Money", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          child: ListTile(
+            leading: CircleAvatar(backgroundColor: chauffeurActuel.couleurAvatar, child: Icon(chauffeurActuel.icone, color: Colors.white)),
+            title: Text("Chauffeur proche: ${chauffeurActuel.nom}", style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+            subtitle: Text("${chauffeurActuel.vehicule} • ⭐ ${chauffeurActuel.note} • ${chauffeurActuel.plaque}", style: const TextStyle(fontSize: 11)),
+            trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.green.shade200)), child: Text("~3 min", style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.w700))),
+          ),
+        ),
+      ],
+    );
   }
 }
 
+// -------- Ecran Estimation avec badges majoration --------
+class EcranEstimation extends StatelessWidget {
+  final String depart;
+  final String arrivee;
+  final int prixBase;
+  final int supplement;
+  final int prixTotal;
+  final bool majorationHeurePointe;
+  final bool majorationPluie;
+  final bool majorationTrafic;
+  final Function(bool) onMajHeurePointe;
+  final Function(bool) onMajPluie;
+  final Function(bool) onMajTrafic;
+  final String Function(int) formatMontant;
+  final VoidCallback onConfirmer;
+  final VoidCallback onRetour;
+  const EcranEstimation({super.key, required this.depart, required this.arrivee, required this.prixBase, required this.supplement, required this.prixTotal, required this.majorationHeurePointe, required this.majorationPluie, required this.majorationTrafic, required this.onMajHeurePointe, required this.onMajPluie, required this.onMajTrafic, required this.formatMontant, required this.onConfirmer, required this.onRetour});
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(children: [IconButton(onPressed: onRetour, icon: const Icon(Icons.arrow_back)), const Text("Estimation", style: TextStyle(fontWeight: FontWeight.w800))]),
+        CarteSimulee(hauteur: 140, showCar: false, showRoute: true, depart: depart, arrivee: arrivee),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [const Icon(Icons.trip_origin, size: 14, color: Color(0xFF1B7A6B)), const SizedBox(width: 8), Expanded(child: Text(depart, style: const TextStyle(fontWeight: FontWeight.w600)))]),
+              Container(margin: const EdgeInsets.only(left: 6), height: 18, width: 1, color: Colors.grey.shade300),
+              Row(children: [const Icon(Icons.location_on, size: 14, color: Color(0xFFFF6B35)), const SizedBox(width: 8), Expanded(child: Text(arrivee, style: const TextStyle(fontWeight: FontWeight.w600)))]),
+              const Divider(height: 24),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Distance", style: TextStyle(color: Colors.grey.shade600)), const Text("6.2 km", style: TextStyle(fontWeight: FontWeight.w700))]),
+              const SizedBox(height: 6),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Durée estimée", style: TextStyle(color: Colors.grey.shade600)), Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: const Color(0xFF0E3A3E), borderRadius: BorderRadius.circular(20)), child: const Text("18 min", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)))]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text("Majorations simulées (démo)", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+        const SizedBox(height: 8),
+        // Badges simulés sans calcul complexe
+        Card(
+          child: Column(children: [
+            SwitchListTile(value: majorationHeurePointe, onChanged: onMajHeurePointe, title: const Text("Heure de pointe", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("07h-09h & 17h-20h • +800 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+800", icon: Icons.access_time, active: majorationHeurePointe)),
+            const Divider(height: 1),
+            SwitchListTile(value: majorationPluie, onChanged: onMajPluie, title: const Text("Pluie détectée", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("Météo Douala • +600 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+600", icon: Icons.water_drop, active: majorationPluie)),
+            const Divider(height: 1),
+            SwitchListTile(value: majorationTrafic, onChanged: onMajTrafic, title: const Text("Trafic dense", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("Axe Akwa-Bonapriso • +500 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+500", icon: Icons.traffic, active: majorationTrafic)),
+          ]),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          color: const Color(0xFF0E3A3E),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Prix de base", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)), Text(formatMontant(prixBase), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))]),
+              const SizedBox(height: 6),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Suppléments", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)), Text("+ ${formatMontant(supplement)}", style: const TextStyle(color: Color(0xFFFFC49A), fontWeight: FontWeight.w700))]),
+              const Divider(color: Colors.white24, height: 20),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Total estimé", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)), Text(formatMontant(prixTotal), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20))]),
+              const SizedBox(height: 4),
+              Text("Paiement via Wallet • Mobile Money possible", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(width: double.infinity, child: FilledButton(onPressed: onConfirmer, child: Text("Confirmer • ${formatMontant(prixTotal)}"))),
+        TextButton(onPressed: onRetour, child: const Text("Retour")),
+      ],
+    );
+  }
+}
+
+// Badge visuel majoration
+class BadgeMajoration extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool active;
+  const BadgeMajoration({super.key, required this.label, required this.icon, required this.active});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: active ? const Color(0xFFFF6B35) : Colors.grey.shade200, borderRadius: BorderRadius.circular(20)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 12, color: active ? Colors.white : Colors.grey.shade600), const SizedBox(width: 4), Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: active ? Colors.white : Colors.grey.shade600))]),
+    );
+  }
+}
+
+// -------- Ecran Vérification Wallet (3 cas) --------
+class EcranWalletCheck extends StatelessWidget {
+  final int prixTotal;
+  final int solde;
+  final String Function(int) formatMontant;
+  final VoidCallback onPayer;
+  final VoidCallback onCreditUrgence;
+  final VoidCallback onRecharger;
+  final VoidCallback onRetour;
+  const EcranWalletCheck({super.key, required this.prixTotal, required this.solde, required this.formatMontant, required this.onPayer, required this.onCreditUrgence, required this.onRecharger, required this.onRetour});
+  @override
+  Widget build(BuildContext context) {
+    // Logique 3 cas
+    // Cas A : solde suffisant
+    // Cas B : solde insuffisant mais éligible (>2000 et au moins 3 courses) => crédit urgence
+    // Cas C : sinon refus
+    final bool casA = solde >= prixTotal;
+    final bool eligibleCredit = solde >= 1500 && historiqueMock.length >= 3;
+    final bool casB = !casA && eligibleCredit;
+    // final bool casC = !casA && !eligibleCredit;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(children: [IconButton(onPressed: onRetour, icon: const Icon(Icons.arrow_back)), const Text("Vérification Wallet", style: TextStyle(fontWeight: FontWeight.w800))]),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(children: [
+              Icon(Icons.account_balance_wallet, size: 40, color: const Color(0xFF0E3A3E).withOpacity(0.9)),
+              const SizedBox(height: 8),
+              Text("Solde actuel", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+              Text(formatMontant(solde), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 26, color: Color(0xFF0E3A3E))),
+              const SizedBox(height: 6),
+              Text("Prix course: ${formatMontant(prixTotal)}", style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (casA)
+          Card(
+            color: Colors.green.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [Icon(Icons.check_circle, color: Colors.green.shade700), const SizedBox(width: 8), Text("Solde suffisant", style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w800))]),
+                const SizedBox(height: 8),
+                Text("Ton wallet couvre la course. Le montant sera débité à la fin.", style: TextStyle(color: Colors.green.shade800, fontSize: 12)),
+                const SizedBox(height: 12),
+                SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: onPayer, icon: const Icon(Icons.bolt), label: const Text("Lancer la course"))),
+              ]),
+            ),
+          )
+        else if (casB)
+          Card(
+            color: Colors.orange.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [Icon(Icons.shield, color: Colors.orange.shade800), const SizedBox(width: 8), Expanded(child: Text("Crédit d'urgence disponible", style: TextStyle(color: Colors.orange.shade900, fontWeight: FontWeight.w800)))]),
+                const SizedBox(height: 8),
+                Text("Solde insuffisant (${formatMontant(solde)} < ${formatMontant(prixTotal)}), mais tu es éligible au crédit d'urgence VTC Afrique (client fidèle).", style: TextStyle(color: Colors.orange.shade900, fontSize: 12)),
+                const SizedBox(height: 6),
+                Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.orange.shade200)), child: Row(children: [Icon(Icons.info, size: 14, color: Colors.orange.shade700), const SizedBox(width: 6), Expanded(child: Text("Frais: 1200 FCFA remboursés à la prochaine recharge. Course lancée immédiatement.", style: TextStyle(fontSize: 11, color: Colors.orange.shade800)))])),
+                const SizedBox(height: 12),
+                SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: onCreditUrgence, icon: const Icon(Icons.emergency), label: const Text("Utiliser le crédit d'urgence"))),
+                TextButton(onPressed: onRecharger, child: const Text("Ou recharger maintenant")),
+              ]),
+            ),
+          )
+        else
+          Card(
+            color: Colors.red.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [Icon(Icons.block, color: Colors.red.shade700), const SizedBox(width: 8), Text("Solde insuffisant", style: TextStyle(color: Colors.red.shade800, fontWeight: FontWeight.w800))]),
+                const SizedBox(height: 8),
+                Text("Tu n'es pas éligible au crédit d'urgence (nouveau compte). Recharge ton wallet via Mobile Money pour continuer.", style: TextStyle(color: Colors.red.shade800, fontSize: 12)),
+                const SizedBox(height: 12),
+                SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: () => showRechargeDialog(context), icon: const Icon(Icons.phone_android), label: const Text("Recharger via Mobile Money"))),
+              ]),
+            ),
+          ),
+        const SizedBox(height: 12),
+        Center(child: TextButton.icon(onPressed: onRetour, icon: const Icon(Icons.arrow_back, size: 16), label: const Text("Modifier la course"))),
+      ],
+    );
+  }
+
+  static void showRechargeDialog(BuildContext context) {
+    showDialog(context: context, builder: (_) => AlertDialog(title: const Text("Recharger Wallet (Simulé)"), content: const Text("Choisis ton opérateur:\n• MTN MoMo\n• Orange Money\n\nEntre le montant et valide. Aucun vrai paiement n'est effectué (démo)."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler")), FilledButton(onPressed: () { Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recharge simulée : +5000 FCFA crédités !"))); }, child: const Text("Simuler +5000 FCFA"))]));
+  }
+}
+
+// -------- Ecran Suivi de course (animé) --------
+class EcranSuiviCourse extends StatelessWidget {
+  final String depart;
+  final String arrivee;
+  final ChauffeurMock chauffeur;
+  final double progression;
+  final VoidCallback onSOS;
+  final VoidCallback onArriveeForcee;
+  const EcranSuiviCourse({super.key, required this.depart, required this.arrivee, required this.chauffeur, required this.progression, required this.onSOS, required this.onArriveeForcee});
+  @override
+  Widget build(BuildContext context) {
+    final int pct = (progression * 100).toInt();
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Course en cours", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(20)), child: Text("$pct% • En route", style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)))]),
+        const SizedBox(height: 12),
+        // Carte animée
+        CarteSimulee(hauteur: 260, showCar: true, progression: progression, depart: depart, arrivee: arrivee),
+        const SizedBox(height: 12),
+        LinearProgressIndicator(value: progression, minHeight: 6, borderRadius: BorderRadius.circular(99), backgroundColor: Colors.grey.shade200, color: const Color(0xFFFF6B35)),
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(children: [
+              CircleAvatar(radius: 26, backgroundColor: chauffeur.couleurAvatar, child: Icon(chauffeur.icone, color: Colors.white, size: 26)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(chauffeur.nom, style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text("${chauffeur.vehicule} • ${chauffeur.plaque}", style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                  Row(children: [Icon(Icons.star, size: 14, color: Colors.amber.shade700), const SizedBox(width: 4), Text("${chauffeur.note} • Chauffeur vérifié", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))]),
+                ]),
+              ),
+              IconButton.filled(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Appel simulé vers le chauffeur..."))), icon: const Icon(Icons.call), style: IconButton.styleFrom(backgroundColor: const Color(0xFF1B7A6B))),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(child: OutlinedButton.icon(onPressed: onSOS, icon: const Icon(Icons.sos, color: Colors.red), label: const Text("SOS", style: TextStyle(color: Colors.red, fontWeight: FontWeight.w800)), style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.red)))),
+          const SizedBox(width: 10),
+          Expanded(child: OutlinedButton.icon(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Partage de position envoyé à un proche (simulé)"))), icon: const Icon(Icons.share_location), label: const Text("Partager"))),
+        ]),
+        const SizedBox(height: 8),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Départ", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), Text(depart, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]),
+              const Divider(height: 16),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Arrivée", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), Text(arrivee, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]),
+              const Divider(height: 16),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Temps restant", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), Text("${(18 * (1 - progression)).ceil()} min", style: const TextStyle(fontWeight: FontWeight.w800))]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextButton(onPressed: onArriveeForcee, child: const Text("Simuler arrivée immédiate (démo)")),
+      ],
+    );
+  }
+}
+
+// -------- Ecran fin de course + notation --------
+class EcranFinCourse extends StatelessWidget {
+  final String depart;
+  final String arrivee;
+  final int prix;
+  final ChauffeurMock chauffeur;
+  final int noteDonnee;
+  final Function(int) onNote;
+  final String Function(int) formatMontant;
+  final VoidCallback onTerminer;
+  const EcranFinCourse({super.key, required this.depart, required this.arrivee, required this.prix, required this.chauffeur, required this.noteDonnee, required this.onNote, required this.formatMontant, required this.onTerminer});
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const Icon(Icons.check_circle, color: Colors.green, size: 56),
+        const SizedBox(height: 8),
+        const Center(child: Text("Course terminée !", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22))),
+        Center(child: Text("Merci d'avoir voyagé avec VTC Afrique", style: TextStyle(color: Colors.grey.shade600))),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text("Reçu", style: TextStyle(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Trajet", style: TextStyle(color: Colors.grey.shade600)), Text("$depart → $arrivee", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]),
+              const SizedBox(height: 6),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Chauffeur", style: TextStyle(color: Colors.grey.shade600)), Text(chauffeur.nom, style: const TextStyle(fontWeight: FontWeight.w600))]),
+              const SizedBox(height: 6),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Distance", style: TextStyle(color: Colors.grey.shade600)), const Text("6.2 km")]),
+              const Divider(height: 20),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Total payé", style: TextStyle(fontWeight: FontWeight.w800)), Text(formatMontant(prix), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0E3A3E)))]),
+              const SizedBox(height: 4),
+              Row(children: [Icon(Icons.receipt, size: 12, color: Colors.grey.shade500), const SizedBox(width: 4), Text("Reçu envoyé par SMS (simulé) • ID #VTC-${20260821}", style: TextStyle(fontSize: 10, color: Colors.grey.shade500))]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(children: [
+              const Text("Note ton chauffeur", style: TextStyle(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Text("Optionnel - tu peux passer", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+              const SizedBox(height: 12),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(5, (i) {
+                final selected = i < noteDonnee;
+                return IconButton(onPressed: () => onNote(i + 1), icon: Icon(selected ? Icons.star : Icons.star_border, color: selected ? Colors.amber.shade700 : Colors.grey.shade400, size: 32));
+              })),
+              if (noteDonnee > 0) Text(noteDonnee == 5 ? "Excellent !" : noteDonnee >= 4 ? "Merci !" : "Merci pour ton retour", style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E3A3E))),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(width: double.infinity, child: FilledButton(onPressed: onTerminer, child: const Text("Terminer"))),
+        TextButton(onPressed: onTerminer, child: const Text("Passer la notation")),
+      ],
+    );
+  }
+}
+
+// -------- Wallet Passager complet --------
 class WalletPassager extends StatelessWidget {
   final int soldeFCFA;
   final DeviseMock devise;
@@ -424,24 +867,76 @@ class WalletPassager extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text("Wallet VTC Afrique", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Wallet VTC Afrique", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)), Icon(Icons.visibility, color: Colors.white.withOpacity(0.8), size: 18)]),
               const SizedBox(height: 8),
               Text(formatMontant(soldeFCFA), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 30)),
               Text("Solde disponible • ${devise.code} - ${devise.nom}", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
               const SizedBox(height: 16),
               Row(children: [
-                Expanded(child: FilledButton.icon(onPressed: () {}, icon: const Icon(Icons.add), label: const Text("Recharger"))),
+                Expanded(child: FilledButton.icon(onPressed: () => _showRecharge(context), icon: const Icon(Icons.add), label: const Text("Recharger"))),
                 const SizedBox(width: 10),
-                Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.arrow_downward), label: const Text("Retrait"))),
+                Expanded(child: OutlinedButton.icon(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Retrait simulé - bientôt disponible"))), icon: const Icon(Icons.arrow_upward, color: Colors.white), label: const Text("Retirer", style: TextStyle(color: Colors.white)), style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white54), foregroundColor: Colors.white))),
               ]),
             ]),
           ),
         ),
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text("Devise (multi-pays - démo)", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+              const SizedBox(height: 4),
+              Text("Conversion simulée sans vraie API de change", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+              const SizedBox(height: 10),
+              SegmentedButton<DeviseMock>(
+                segments: devisesMock.map((d) => ButtonSegment(value: d, label: Text(d.code), icon: Text(d.symbole))).toList(),
+                selected: {devise},
+                onSelectionChanged: (s) => onDeviseChange(s.first),
+              ),
+              const SizedBox(height: 8),
+              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFFF6F7F6), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.grey.shade200)), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Ex: 3000 FCFA =", style: TextStyle(color: Colors.grey.shade700, fontSize: 12)), Text(formatMontant(3000), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Color(0xFF0E3A3E)))])),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Historique transactions", style: TextStyle(fontWeight: FontWeight.w800)), Text("${transactionsMock.length} opérations", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))]),
+        const SizedBox(height: 8),
+        ...transactionsMock.map((t) => Card(
+              child: ListTile(
+                leading: CircleAvatar(backgroundColor: t.montant > 0 ? Colors.green.shade50 : Colors.red.shade50, child: Icon(t.icone, size: 18, color: t.montant > 0 ? Colors.green.shade700 : Colors.red.shade700)),
+                title: Text(t.libelle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                subtitle: Text(t.date, style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+                trailing: Text("${t.montant > 0 ? '+' : ''}${formatMontant(t.montant.abs())}", style: TextStyle(fontWeight: FontWeight.w800, color: t.montant > 0 ? Colors.green.shade700 : Colors.red.shade700, fontSize: 12)),
+              ),
+            )),
       ],
+    );
+  }
+
+  void _showRecharge(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Recharger (Simulé)"),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text("Opérateur Mobile Money:"),
+          const SizedBox(height: 10),
+          Row(children: [Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.phone_android, color: Color(0xFFFFCC00)), label: const Text("MTN MoMo"))), const SizedBox(width: 8), Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.phone_android, color: Colors.orange), label: const Text("Orange Money")))]),
+          const SizedBox(height: 12),
+          const Text("Montants rapides:", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler")),
+          FilledButton(onPressed: () { Navigator.pop(context); onSoldeChange(5000); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recharge simulée +5000 FCFA !"), backgroundColor: Color(0xFF0E3A3E))); }, child: const Text("+5 000")),
+          FilledButton(onPressed: () { Navigator.pop(context); onSoldeChange(10000); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recharge simulée +10 000 FCFA !"))); }, child: const Text("+10 000")),
+        ],
+      ),
     );
   }
 }
 
+// -------- Historique --------
 class HistoriquePassager extends StatelessWidget {
   final String Function(int) formatMontant;
   const HistoriquePassager({super.key, required this.formatMontant});
@@ -452,6 +947,19 @@ class HistoriquePassager extends StatelessWidget {
       children: [
         const Text("Historique des courses", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
         Text("${historiqueMock.length} courses • Douala", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+        const SizedBox(height: 12),
+        ...historiqueMock.map((c) => Card(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: c.statut == "Terminée" ? Colors.green.shade50 : Colors.red.shade50, borderRadius: BorderRadius.circular(20), border: Border.all(color: c.statut == "Terminée" ? Colors.green.shade200 : Colors.red.shade200)), child: Text(c.statut, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: c.statut == "Terminée" ? Colors.green.shade700 : Colors.red.shade700))), Text(c.date, style: TextStyle(color: Colors.grey.shade600, fontSize: 11))]),
+                  const SizedBox(height: 10),
+                  Row(children: [const Icon(Icons.trip_origin, size: 12, color: Color(0xFF1B7A6B)), const SizedBox(width: 6), Text(c.depart, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)), const Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Icon(Icons.arrow_forward, size: 12)), Text(c.arrivee, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13))]),
+                  const SizedBox(height: 8),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(formatMontant(c.prix), style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF0E3A3E))), Row(children: List.generate(5, (i) => Icon(i < c.note ? Icons.star : Icons.star_border, size: 14, color: Colors.amber.shade700)))]),
+                ]),
+              ),
+            )),
       ],
     );
   }
@@ -466,6 +974,10 @@ class ProfilPassager extends StatelessWidget {
       const SizedBox(height: 12),
       const Center(child: Text("Raphaela M.", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18))),
       Center(child: Text("Passager • Douala • Membre depuis Jan 2026", style: TextStyle(color: Colors.grey.shade600, fontSize: 12))),
+      const SizedBox(height: 16),
+      Card(child: Column(children: [ListTile(leading: const Icon(Icons.phone), title: const Text("Téléphone"), subtitle: const Text("+237 6 XX XX XX XX (fictif)"), trailing: const Icon(Icons.verified, color: Colors.green)), const Divider(height: 1), ListTile(leading: const Icon(Icons.shield), title: const Text("Crédit d'urgence"), subtitle: const Text("Éligible • Plafond 3000 FCFA"))])),
+      const SizedBox(height: 12),
+      Card(child: ListTile(leading: const Icon(Icons.help_outline), title: const Text("Support & Sécurité"), subtitle: const Text("SOS, signalement, assistance 24/7 (simulé)"))),
     ]);
   }
 }
@@ -484,56 +996,341 @@ class ChauffeurRoot extends StatefulWidget {
 class _ChauffeurRootState extends State<ChauffeurRoot> {
   bool enLigne = true;
   String creneau = "Jour (06h-18h)";
+  bool courseEntranteVisible = true;
+  int countdown = 15;
+  Timer? timerCountdown;
+  String statutCourse = "aucune"; // aucune, entrante, enCours, terminee
+  double gainsMois = 187500;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    timerCountdown?.cancel();
+    countdown = 15;
+    timerCountdown = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!enLigne || statutCourse != "aucune") { t.cancel(); return; }
+      setState(() {
+        countdown--;
+        if (countdown <= 0) {
+          courseEntranteVisible = false;
+          t.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() { timerCountdown?.cancel(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.index == 1) {
+      // Ecran course en cours
+      return ListView(padding: const EdgeInsets.all(16), children: [
+        const Text("Course en cours", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+        const SizedBox(height: 12),
+        CarteSimulee(hauteur: 200, showCar: true, progression: statutCourse == "enCours" ? 0.6 : 0.2, depart: "Deido", arrivee: "Bonapriso"),
+        const SizedBox(height: 12),
+        Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: const Text("Cliente: Marie L.", style: TextStyle(fontWeight: FontWeight.w700)), subtitle: const Text("Deido → Bonapriso • 2800 FCFA • Paiement Wallet"))),
+        const SizedBox(height: 12),
+        if (statutCourse == "aucune" || statutCourse == "entrante") ...[
+          const Card(child: Padding(padding: EdgeInsets.all(16), child: Text("Aucune course en cours. Accepte une course entrante depuis l'onglet Disponibilité.", style: TextStyle(color: Colors.grey)))),
+        ] else if (statutCourse == "enCours") ...[
+          SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: () => setState(() => statutCourse = "terminee"), icon: const Icon(Icons.flag), label: const Text("Terminer la course"))),
+          const SizedBox(height: 8),
+          SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Passager à bord confirmé"))), icon: const Icon(Icons.check), label: const Text("Passager à bord"))),
+        ] else ...[
+          Card(color: Colors.green.shade50, child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [Icon(Icons.check_circle, color: Colors.green.shade700, size: 40), const SizedBox(height: 8), const Text("Course terminée ! +2800 FCFA crédités", style: TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 8), FilledButton(onPressed: () => setState(() => statutCourse = "aucune"), child: const Text("Retour disponibilité"))]))),
+        ]
+      ]);
+    }
+    if (widget.index == 2) {
+      return ListView(padding: const EdgeInsets.all(16), children: [
+        Card(color: const Color(0xFF0E3A3E), child: Padding(padding: const EdgeInsets.all(18), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Gains du mois", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)), Text("${gainsMois.toInt()} FCFA", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 28)), Text("Août 2026 • 34 courses", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11))]))),
+        const SizedBox(height: 12),
+        const Text("Détail des courses", style: TextStyle(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 8),
+        ...historiqueMock.take(5).map((c) => Card(child: ListTile(title: Text("${c.depart} → ${c.arrivee}", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)), subtitle: Text(c.date, style: TextStyle(color: Colors.grey.shade600, fontSize: 11)), trailing: Text("+${c.prix} FCFA", style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1B7A6B)))))),
+        const SizedBox(height: 12),
+        Card(child: Padding(padding: const EdgeInsets.all(14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Commission VTC (15%)", style: TextStyle(color: Colors.grey.shade600)), const Text("-28 125 FCFA")]))),
+      ]);
+    }
+    // Index 0 : disponibilité
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(children: [
-              const Text("Mode Chauffeur", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              SwitchListTile(value: enLigne, onChanged: (v) => setState(() => enLigne = v), title: const Text("En ligne"), subtitle: Text(creneau)),
-            ]),
-          ),
-        ),
+        Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Disponibilité", style: TextStyle(fontWeight: FontWeight.w800)), Switch(value: enLigne, onChanged: (v) { setState(() { enLigne = v; if (v) { courseEntranteVisible = true; _startCountdown(); } }); }, activeColor: const Color(0xFF1B7A6B))]),
+          Row(children: [Icon(enLigne ? Icons.circle : Icons.circle_outlined, size: 10, color: enLigne ? Colors.green : Colors.grey), const SizedBox(width: 6), Text(enLigne ? "En ligne • Visible pour les passagers" : "Hors ligne • Invisible", style: TextStyle(color: enLigne ? Colors.green.shade700 : Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 12))]),
+          const SizedBox(height: 12),
+          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF6F7F6), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)), child: Row(children: [const Icon(Icons.schedule, size: 18, color: Color(0xFF0E3A3E)), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Créneau assigné", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)), Text(creneau, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13))]), const Spacer(), DropdownButton<String>(value: creneau, underline: const SizedBox(), items: const [DropdownMenuItem(value: "Jour (06h-18h)", child: Text("Jour")), DropdownMenuItem(value: "Nuit (18h-06h)", child: Text("Nuit"))], onChanged: (v) => setState(() => creneau = v!))]))])) ,
+        const SizedBox(height: 12),
+        if (enLigne && courseEntranteVisible && statutCourse == "aucune")
+          Card(
+            color: Colors.orange.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Row(children: [Icon(Icons.notifications_active, color: Colors.orange.shade800, size: 18), const SizedBox(width: 6), Text("Course entrante !", style: TextStyle(color: Colors.orange.shade900, fontWeight: FontWeight.w900))]), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.orange.shade800, borderRadius: BorderRadius.circular(20)), child: Text("$countdown s", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12)))]),
+                const SizedBox(height: 10),
+                const Text("Passager: Marie L. • ⭐ 4.8", style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                const Text("Deido → Bonapriso • 6.2 km • 18 min", style: TextStyle(fontSize: 12)),
+                const SizedBox(height: 4),
+                const Text("Prix: 3200 FCFA • Paiement Wallet", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF0E3A3E))),
+                const SizedBox(height: 12),
+                LinearProgressIndicator(value: countdown / 15, color: Colors.orange.shade800, backgroundColor: Colors.orange.shade100),
+                const SizedBox(height: 12),
+                Row(children: [Expanded(child: OutlinedButton(onPressed: () { setState(() { courseEntranteVisible = false; }); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Course refusée")) ); _startCountdown(); }, child: const Text("Refuser"))), const SizedBox(width: 10), Expanded(child: FilledButton(onPressed: () { setState(() { statutCourse = "enCours"; courseEntranteVisible = false; gainsMois += 3200; }); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Course acceptée ! Direction Deido")) ); }, child: const Text("Accepter")))]),
+              ]),
+            ),
+          )
+        else if (!enLigne)
+          const Card(child: Padding(padding: EdgeInsets.all(24), child: Center(child: Text("Tu es hors ligne. Passe en ligne pour recevoir des courses.", style: TextStyle(color: Colors.grey))))),
+        const SizedBox(height: 12),
+        Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text("Aujourd'hui", style: TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 8), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Courses", style: TextStyle(color: Colors.grey.shade600)), const Text("5", style: TextStyle(fontWeight: FontWeight.w700))]), const Divider(height: 16), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Gains", style: TextStyle(color: Colors.grey.shade600)), const Text("14 200 FCFA", style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1B7A6B)))]), const Divider(height: 16), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Note moyenne", style: TextStyle(color: Colors.grey.shade600)), Row(children: [Icon(Icons.star, size: 14, color: Colors.amber.shade700), const Text(" 4.9", style: TextStyle(fontWeight: FontWeight.w700))])])]))),
       ],
     );
   }
 }
 
 // ============================================================
-// SECTION 7 - MODE ADMIN
+// SECTION 7 - MODE ADMIN (SIMPLIFIE)
 // ============================================================
 
-class AdminRoot extends StatefulWidget {
+class AdminRoot extends StatelessWidget {
   final int index;
   const AdminRoot({super.key, required this.index});
   @override
-  State<AdminRoot> createState() => _AdminRootState();
-}
-
-class _AdminRootState extends State<AdminRoot> {
-  @override
   Widget build(BuildContext context) {
+    if (index == 1) {
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text("Chauffeurs", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+          Text("${chauffeursMock.length} chauffeurs • Douala", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+          const SizedBox(height: 12),
+          ...chauffeursMock.map((c) => Card(
+                child: ListTile(
+                  leading: CircleAvatar(backgroundColor: c.couleurAvatar, child: Icon(c.icone, color: Colors.white, size: 18)),
+                  title: Text(c.nom, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  subtitle: Text("${c.vehicule} • ${c.plaque} • ${c.creneau}", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+                  trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: c.actif ? Colors.green.shade50 : Colors.grey.shade200, borderRadius: BorderRadius.circular(20), border: Border.all(color: c.actif ? Colors.green.shade200 : Colors.grey.shade300)), child: Text(c.actif ? "Actif" : "Inactif", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: c.actif ? Colors.green.shade700 : Colors.grey.shade600))),
+                    const SizedBox(height: 4),
+                    Text("⭐ ${c.note} • ${c.coursesDuJour} courses", style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                  ]),
+                ),
+              )),
+        ],
+      );
+    }
+    if (index == 2) {
+      final alertes = [
+        {"titre": "Écart kilométrique détecté", "desc": "Véhicule 3 • LT 3421 CE • +4.2 km vs trajet optimal", "time": "Il y a 12 min", "color": Colors.orange},
+        {"titre": "SOS passager", "desc": "Course #VTC-8891 • Bonapriso • Intervention en cours", "time": "Il y a 34 min", "color": Colors.red},
+        {"titre": "Paiement échoué", "desc": "Wallet insuffisant • Passager A. • Crédit d'urgence proposé", "time": "Il y a 1h", "color": Colors.blue},
+        {"titre": "Chauffeur hors zone", "desc": "Emmanuel T. • Sortie de Douala signalée", "time": "Il y a 2h", "color": Colors.purple},
+      ];
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text("Alertes système", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+          Text("${alertes.length} alertes actives", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+          const SizedBox(height: 12),
+          ...alertes.map((a) => Card(
+                child: ListTile(
+                  leading: CircleAvatar(backgroundColor: (a["color"] as Color).withOpacity(0.12), child: Icon(Icons.warning_amber, color: a["color"] as Color, size: 18)),
+                  title: Text(a["titre"] as String, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(a["desc"] as String, style: TextStyle(color: Colors.grey.shade700, fontSize: 11)), const SizedBox(height: 4), Text(a["time"] as String, style: TextStyle(color: Colors.grey.shade500, fontSize: 10))]),
+                  trailing: TextButton(onPressed: () {}, child: const Text("Voir", style: TextStyle(fontSize: 11))),
+                ),
+              )),
+        ],
+      );
+    }
+    // Dashboard
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        const Text("Tableau de bord • Douala", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+        Text("20 Août 2026 • Données fictives temps réel (simulé)", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+        const SizedBox(height: 12),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.45,
+          children: [
+            _statCard("Courses du jour", "127", "+12% vs hier", Icons.route, const Color(0xFF0E3A3E)),
+            _statCard("Chauffeurs actifs", "18 / 24", "75% en ligne", Icons.local_taxi, const Color(0xFF1B7A6B)),
+            _statCard("Revenus du jour", "342 500 FCFA", "Commission 15% incluse", Icons.payments, const Color(0xFFFF6B35)),
+            _statCard("Note moyenne", "4.8 / 5", "312 avis aujourd'hui", Icons.star, Colors.amber.shade700),
+          ],
+        ),
+        const SizedBox(height: 12),
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(children: [
-              const Text("Mode Admin", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            padding: const EdgeInsets.all(14),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text("Répartition par créneau", style: TextStyle(fontWeight: FontWeight.w800)),
               const SizedBox(height: 12),
-              Text("Chauffeurs actifs: ${chauffeursMock.where((c) => c.actif).length}", style: const TextStyle(fontSize: 14)),
-              Text("Courses totales: ${historiqueMock.length}", style: const TextStyle(fontSize: 14)),
+              Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF1B7A6B), shape: BoxShape.circle)), const SizedBox(width: 6), const Text("Jour", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]), const SizedBox(height: 4), Text("14 chauffeurs • 82 courses", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))])), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF0E3A3E), shape: BoxShape.circle)), const SizedBox(width: 6), const Text("Nuit", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]), const SizedBox(height: 4), Text("10 chauffeurs • 45 courses", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))]))]),
+              const SizedBox(height: 12),
+              ClipRRect(borderRadius: BorderRadius.circular(99), child: LinearProgressIndicator(value: 0.65, minHeight: 8, backgroundColor: const Color(0xFF0E3A3E), color: const Color(0xFF1B7A6B))),
             ]),
           ),
         ),
       ],
     );
   }
+
+  static Widget _statCard(String titre, String valeur, String sousTitre, IconData icon, Color color) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Icon(icon, size: 18, color: color)), Icon(Icons.trending_up, size: 14, color: Colors.green.shade600)]),
+          const Spacer(),
+          Text(valeur, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: color)),
+          Text(titre, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          Text(sousTitre, style: TextStyle(color: Colors.grey.shade600, fontSize: 10)),
+        ]),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// SECTION 8 - WIDGET CARTE SIMULEE (SANS GOOGLE MAPS)
+// ============================================================
+
+class CarteSimulee extends StatelessWidget {
+  final double hauteur;
+  final bool showCar;
+  final double progression;
+  final bool showRoute;
+  final String? depart;
+  final String? arrivee;
+  const CarteSimulee({super.key, required this.hauteur, this.showCar = false, this.progression = 0, this.showRoute = false, this.depart, this.arrivee});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: hauteur,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFE8F5E9), Color(0xFFDCEDC8), Color(0xFFBBDEFB)]),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            // Quadrillage simulant rues
+            Positioned.fill(child: CustomPaint(painter: _GrillePainter())),
+            // Zones
+            Positioned(left: 16, top: 16, child: _zoneLabel("AKWA")),
+            Positioned(right: 16, top: 40, child: _zoneLabel("BONAPRISO")),
+            Positioned(left: 40, bottom: 30, child: _zoneLabel("DEIDO")),
+            Positioned(right: 40, bottom: 16, child: _zoneLabel("MAKEPE")),
+            // Route simulée
+            if (showRoute || showCar)
+              Positioned.fill(
+                child: CustomPaint(painter: _RoutePainter(progression: showCar ? progression : 1)),
+              ),
+            // Points A et B
+            Positioned(left: 30, top: hauteur / 2 - 10, child: _pointA()),
+            Positioned(right: 30, top: hauteur / 2 - 10, child: _pointB()),
+            // Véhicule animé
+            if (showCar)
+              Positioned(
+                left: 30 + (MediaQuery.of(context).size.width - 64 - 60) * progression,
+                top: hauteur / 2 - 14 + (progression < 0.5 ? progression * 20 : (1 - progression) * 20),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(color: const Color(0xFF0E3A3E), borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 2))]),
+                  child: const Icon(Icons.local_taxi, color: Colors.white, size: 16),
+                ),
+              ),
+            // Légende carte fictive
+            Positioned(
+              left: 10,
+              bottom: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade300)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.map, size: 12, color: Colors.grey.shade700), const SizedBox(width: 4), Text("Carte simulée • Douala (démo)", style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w600))]),
+              ),
+            ),
+            Positioned(
+              right: 10,
+              bottom: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade300)),
+                child: Column(children: [Icon(Icons.add, size: 12, color: Colors.grey.shade700), Container(height: 1, width: 12, color: Colors.grey.shade300, margin: const EdgeInsets.symmetric(vertical: 2)), Icon(Icons.remove, size: 12, color: Colors.grey.shade700)]),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _zoneLabel(String label) => Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.white.withOpacity(0.85), borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.grey.shade300)), child: Text(label, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: Colors.grey.shade700, letterSpacing: 0.5)));
+
+  Widget _pointA() => Column(children: [Container(width: 12, height: 12, decoration: BoxDecoration(color: const Color(0xFF1B7A6B), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4)])), const SizedBox(height: 2), Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: const Color(0xFF1B7A6B), borderRadius: BorderRadius.circular(4)), child: const Text("A", style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)))]);
+
+  Widget _pointB() => Column(children: [Container(width: 12, height: 12, decoration: BoxDecoration(color: const Color(0xFFFF6B35), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 4)])), const SizedBox(height: 2), Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: const Color(0xFFFF6B35), borderRadius: BorderRadius.circular(4)), child: const Text("B", style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)))]);
+}
+
+// Peintre quadrillage
+class _GrillePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white.withOpacity(0.5)..strokeWidth = 1;
+    for (double x = 0; x < size.width; x += 40) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += 40) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+    // Rivière simulée (Wouri)
+    final river = Paint()..color = const Color(0xFF90CAF9).withOpacity(0.35)..style = PaintingStyle.stroke..strokeWidth = 14..strokeCap = StrokeCap.round;
+    final path = Path()..moveTo(0, size.height * 0.7)..quadraticBezierTo(size.width * 0.3, size.height * 0.6, size.width * 0.6, size.height * 0.75)..quadraticBezierTo(size.width * 0.8, size.height * 0.85, size.width, size.height * 0.8);
+    canvas.drawPath(path, river);
+  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Peintre route
+class _RoutePainter extends CustomPainter {
+  final double progression;
+  _RoutePainter({required this.progression});
+  @override
+  void paint(Canvas canvas, Size size) {
+    final base = Paint()..color = Colors.white.withOpacity(0.9)..style = PaintingStyle.stroke..strokeWidth = 8..strokeCap = StrokeCap.round;
+    final trace = Paint()..color = const Color(0xFF0E3A3E)..style = PaintingStyle.stroke..strokeWidth = 3..strokeCap = StrokeCap.round;
+    final path = Path()..moveTo(36, size.height / 2)..cubicTo(size.width * 0.3, size.height * 0.3, size.width * 0.6, size.height * 0.7, size.width - 36, size.height / 2);
+    canvas.drawPath(path, base);
+    // Portion parcourue (pour l'animation)
+    final metrics = path.computeMetrics().first;
+    final extract = metrics.extractPath(0, metrics.length * progression);
+    canvas.drawPath(extract, trace..color = const Color(0xFFFF6B35));
+    // Pointillés
+    final dash = Paint()..color = Colors.white..style = PaintingStyle.stroke..strokeWidth = 2;
+    for (double i = 0; i < 1; i += 0.08) {
+      final pos = metrics.getTangentForOffset(metrics.length * i);
+      if (pos != null) canvas.drawCircle(pos.position, 1.2, dash);
+    }
+  }
+  @override
+  bool shouldRepaint(covariant _RoutePainter oldDelegate) => oldDelegate.progression != progression;
 }
