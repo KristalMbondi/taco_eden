@@ -147,7 +147,7 @@ class VTCAfriqueApp extends StatelessWidget {
           elevation: 0,
           centerTitle: true,
         ),
-        cardTheme: CardThemeData(
+        cardTheme: CardTheme(
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade200)),
         ),
@@ -1067,7 +1067,8 @@ class _ChauffeurRootState extends State<ChauffeurRoot> {
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Disponibilité", style: TextStyle(fontWeight: FontWeight.w800)), Switch(value: enLigne, onChanged: (v) { setState(() { enLigne = v; if (v) { courseEntranteVisible = true; _startCountdown(); } }); }, activeColor: const Color(0xFF1B7A6B))]),
           Row(children: [Icon(enLigne ? Icons.circle : Icons.circle_outlined, size: 10, color: enLigne ? Colors.green : Colors.grey), const SizedBox(width: 6), Text(enLigne ? "En ligne • Visible pour les passagers" : "Hors ligne • Invisible", style: TextStyle(color: enLigne ? Colors.green.shade700 : Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 12))]),
           const SizedBox(height: 12),
-          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF6F7F6), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)), child: Row(children: [const Icon(Icons.schedule, size: 18, color: Color(0xFF0E3A3E)), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Créneau assigné", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)), Text(creneau, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13))]), const Spacer(), DropdownButton<String>(value: creneau, underline: const SizedBox(), items: const [DropdownMenuItem(value: "Jour (06h-18h)", child: Text("Jour")), DropdownMenuItem(value: "Nuit (18h-06h)", child: Text("Nuit"))], onChanged: (v) => setState(() => creneau = v!))]))])) ,
+          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF6F7F6), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)), child: Row(children: [const Icon(Icons.schedule, size: 18, color: Color(0xFF0E3A3E)), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Créneau assigné", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)), Text(creneau, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13))]), const Spacer(), DropdownButton<String>(value: creneau, underline: const SizedBox(), items: const [DropdownMenuItem(value: "Jour (06h-18h)", child: Text("Jour")), DropdownMenuItem(value: "Nuit (18h-06h)", child: Text("Nuit"))], onChanged: (v) => setState(() => creneau = v!))]))])),
+        ),
         const SizedBox(height: 12),
         if (enLigne && courseEntranteVisible && statutCourse == "aucune")
           Card(
