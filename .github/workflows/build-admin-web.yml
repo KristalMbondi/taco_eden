@@ -1,4 +1,4 @@
-name: Build Admin Web
+﻿name: Build Admin Web
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
           cache: true
       - working-directory: apps/admin_web
         run: |
-          if [ ! -d web ]; then flutter create . --platforms=web; else echo "web exists - skip create"; fi
+          flutter create . --platforms=web --overwrite
           flutter pub get
           flutter analyze || echo "warnings ok"
           flutter build web --release
@@ -32,3 +32,4 @@ jobs:
         with:
           name: taco-eden-admin-web
           path: apps/admin_web/build/web
+

@@ -113,8 +113,8 @@ final List<TransactionMock> transactionsMock = [
 
 final List<DeviseMock> devisesMock = [
   DeviseMock(code: "FCFA", nom: "Franc CFA", symbole: "FCFA", tauxVersFCFA: 1),
-  DeviseMock(code: "NGN", nom: "Naira NigÃ©rian", symbole: "â‚¦", tauxVersFCFA: 0.75),
-  DeviseMock(code: "GHS", nom: "Cedi GhanÃ©en", symbole: "GHâ‚µ", tauxVersFCFA: 0.022),
+  DeviseMock(code: "NGN", nom: "Naira NigÃ©rian", symbole: "NGN", tauxVersFCFA: 0.75),
+  DeviseMock(code: "GHS", nom: "Cedi GhanÃ©en", symbole: "GHS", tauxVersFCFA: 0.022),
 ];
 
 // ============================================================
@@ -193,8 +193,8 @@ class _RacineAppState extends State<RacineApp> {
     double taux = deviseSelectionnee.tauxVersFCFA;
     if (deviseSelectionnee.code == "FCFA") return "$montantFCFA ${deviseSelectionnee.symbole}";
     double converti = montantFCFA * taux;
-    if (deviseSelectionnee.code == "NGN") return "â‚¦${converti.toStringAsFixed(0)}";
-    if (deviseSelectionnee.code == "GHS") return "GHâ‚µ${converti.toStringAsFixed(2)}";
+    if (deviseSelectionnee.code == "NGN") return "NGN${converti.toStringAsFixed(0)}";
+    if (deviseSelectionnee.code == "GHS") return "GHS${converti.toStringAsFixed(2)}";
     return "${converti.toStringAsFixed(0)} ${deviseSelectionnee.code}";
   }
 
@@ -211,7 +211,7 @@ class _RacineAppState extends State<RacineApp> {
     return Scaffold(
       // Barre haute avec sÃ©lecteur de rÃ´le (exigence)
       appBar: AppBar(
-        title: const Text("TACO EDEN â€¢ Douala", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+        title: const Text("TACO EDEN - Douala", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(62),
           child: Container(
@@ -494,7 +494,7 @@ class EcranAccueilPassager extends StatelessWidget {
         // Carte simulÃ©e (Container dÃ©gradÃ© + formes)
         CarteSimulee(hauteur: 220, showCar: false),
         const SizedBox(height: 12),
-        Row(children: [Icon(Icons.location_on, size: 14, color: Colors.grey.shade600), const SizedBox(width: 6), Text("Position actuelle: $depart â€¢ Douala, Cameroun", style: TextStyle(fontSize: 12, color: Colors.grey.shade600))]),
+        Row(children: [Icon(Icons.location_on, size: 14, color: Colors.grey.shade600), const SizedBox(width: 6), Text("Position actuelle: $depart - Douala, Cameroun", style: TextStyle(fontSize: 12, color: Colors.grey.shade600))]),
         const SizedBox(height: 16),
         Card(
           child: Padding(
@@ -515,7 +515,7 @@ class EcranAccueilPassager extends StatelessWidget {
               const SizedBox(height: 16),
               SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: () => onCommander(destCtrl.text), icon: const Icon(Icons.bolt), label: const Text("Commander maintenant"))),
               const SizedBox(height: 8),
-              Center(child: Text("Estimation instantanÃ©e â€¢ Paiement Mobile Money", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
+              Center(child: Text("Estimation instantanÃ©e - Paiement Mobile Money", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
             ]),
           ),
         ),
@@ -524,7 +524,7 @@ class EcranAccueilPassager extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(backgroundColor: chauffeurActuel.couleurAvatar, child: Icon(chauffeurActuel.icone, color: Colors.white)),
             title: Text("Chauffeur proche: ${chauffeurActuel.nom}", style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-            subtitle: Text("${chauffeurActuel.vehicule} â€¢ â­ ${chauffeurActuel.note} â€¢ ${chauffeurActuel.plaque}", style: const TextStyle(fontSize: 11)),
+            subtitle: Text("${chauffeurActuel.vehicule} - â­ ${chauffeurActuel.note} - ${chauffeurActuel.plaque}", style: const TextStyle(fontSize: 11)),
             trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.green.shade200)), child: Text("~3 min", style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.w700))),
           ),
         ),
@@ -578,11 +578,11 @@ class EcranEstimation extends StatelessWidget {
         // Badges simulÃ©s sans calcul complexe
         Card(
           child: Column(children: [
-            SwitchListTile(value: majorationHeurePointe, onChanged: onMajHeurePointe, title: const Text("Heure de pointe", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("07h-09h & 17h-20h â€¢ +800 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+800", icon: Icons.access_time, active: majorationHeurePointe)),
+            SwitchListTile(value: majorationHeurePointe, onChanged: onMajHeurePointe, title: const Text("Heure de pointe", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("07h-09h & 17h-20h - +800 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+800", icon: Icons.access_time, active: majorationHeurePointe)),
             const Divider(height: 1),
-            SwitchListTile(value: majorationPluie, onChanged: onMajPluie, title: const Text("Pluie dÃ©tectÃ©e", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("MÃ©tÃ©o Douala â€¢ +600 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+600", icon: Icons.water_drop, active: majorationPluie)),
+            SwitchListTile(value: majorationPluie, onChanged: onMajPluie, title: const Text("Pluie dÃ©tectÃ©e", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("MÃ©tÃ©o Douala - +600 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+600", icon: Icons.water_drop, active: majorationPluie)),
             const Divider(height: 1),
-            SwitchListTile(value: majorationTrafic, onChanged: onMajTrafic, title: const Text("Trafic dense", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("Axe Akwa-Bonapriso â€¢ +500 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+500", icon: Icons.traffic, active: majorationTrafic)),
+            SwitchListTile(value: majorationTrafic, onChanged: onMajTrafic, title: const Text("Trafic dense", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: const Text("Axe Akwa-Bonapriso - +500 FCFA", style: TextStyle(fontSize: 11)), secondary: BadgeMajoration(label: "+500", icon: Icons.traffic, active: majorationTrafic)),
           ]),
         ),
         const SizedBox(height: 12),
@@ -597,12 +597,12 @@ class EcranEstimation extends StatelessWidget {
               const Divider(color: Colors.white24, height: 20),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Total estimÃ©", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)), Text(formatMontant(prixTotal), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20))]),
               const SizedBox(height: 4),
-              Text("Paiement via Wallet â€¢ Mobile Money possible", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
+              Text("Paiement via Wallet - Mobile Money possible", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
             ]),
           ),
         ),
         const SizedBox(height: 16),
-        SizedBox(width: double.infinity, child: FilledButton(onPressed: onConfirmer, child: Text("Confirmer â€¢ ${formatMontant(prixTotal)}"))),
+        SizedBox(width: double.infinity, child: FilledButton(onPressed: onConfirmer, child: Text("Confirmer - ${formatMontant(prixTotal)}"))),
         TextButton(onPressed: onRetour, child: const Text("Retour")),
       ],
     );
@@ -716,7 +716,7 @@ class EcranWalletCheck extends StatelessWidget {
   }
 
   static void showRechargeDialog(BuildContext context) {
-    showDialog(context: context, builder: (_) => AlertDialog(title: const Text("Recharger Wallet (SimulÃ©)"), content: const Text("Choisis ton opÃ©rateur:\nâ€¢ MTN MoMo\nâ€¢ Orange Money\n\nEntre le montant et valide. Aucun vrai paiement n'est effectuÃ© (dÃ©mo)."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler")), FilledButton(onPressed: () { Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recharge simulÃ©e : +5000 FCFA crÃ©ditÃ©s !"))); }, child: const Text("Simuler +5000 FCFA"))]));
+    showDialog(context: context, builder: (_) => AlertDialog(title: const Text("Recharger Wallet (SimulÃ©)"), content: const Text("Choisis ton opÃ©rateur:\n- MTN MoMo\n- Orange Money\n\nEntre le montant et valide. Aucun vrai paiement n'est effectuÃ© (dÃ©mo)."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annuler")), FilledButton(onPressed: () { Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recharge simulÃ©e : +5000 FCFA crÃ©ditÃ©s !"))); }, child: const Text("Simuler +5000 FCFA"))]));
   }
 }
 
@@ -735,7 +735,7 @@ class EcranSuiviCourse extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Course en cours", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(20)), child: Text("$pct% â€¢ En route", style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)))]),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Course en cours", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(20)), child: Text("$pct% - En route", style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)))]),
         const SizedBox(height: 12),
         // Carte animÃ©e
         CarteSimulee(hauteur: 260, showCar: true, progression: progression, depart: depart, arrivee: arrivee),
@@ -751,8 +751,8 @@ class EcranSuiviCourse extends StatelessWidget {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(chauffeur.nom, style: const TextStyle(fontWeight: FontWeight.w800)),
-                  Text("${chauffeur.vehicule} â€¢ ${chauffeur.plaque}", style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-                  Row(children: [Icon(Icons.star, size: 14, color: Colors.amber.shade700), const SizedBox(width: 4), Text("${chauffeur.note} â€¢ Chauffeur vÃ©rifiÃ©", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))]),
+                  Text("${chauffeur.vehicule} - ${chauffeur.plaque}", style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                  Row(children: [Icon(Icons.star, size: 14, color: Colors.amber.shade700), const SizedBox(width: 4), Text("${chauffeur.note} - Chauffeur vÃ©rifiÃ©", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))]),
                 ]),
               ),
               IconButton.filled(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Appel simulÃ© vers le chauffeur..."))), icon: const Icon(Icons.call), style: IconButton.styleFrom(backgroundColor: const Color(0xFF2DB872))),
@@ -820,7 +820,7 @@ class EcranFinCourse extends StatelessWidget {
               const Divider(height: 20),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Total payÃ©", style: TextStyle(fontWeight: FontWeight.w800)), Text(formatMontant(prix), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF1A6EBF)))]),
               const SizedBox(height: 4),
-              Row(children: [Icon(Icons.receipt, size: 12, color: Colors.grey.shade500), const SizedBox(width: 4), Text("ReÃ§u envoyÃ© par SMS (simulÃ©) â€¢ ID #VTC-${20260821}", style: TextStyle(fontSize: 10, color: Colors.grey.shade500))]),
+              Row(children: [Icon(Icons.receipt, size: 12, color: Colors.grey.shade500), const SizedBox(width: 4), Text("ReÃ§u envoyÃ© par SMS (simulÃ©) - ID #VTC-${20260821}", style: TextStyle(fontSize: 10, color: Colors.grey.shade500))]),
             ]),
           ),
         ),
@@ -870,7 +870,7 @@ class WalletPassager extends StatelessWidget {
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Wallet TACO EDEN", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)), Icon(Icons.visibility, color: Colors.white.withOpacity(0.8), size: 18)]),
               const SizedBox(height: 8),
               Text(formatMontant(soldeFCFA), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 30)),
-              Text("Solde disponible â€¢ ${devise.code} - ${devise.nom}", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
+              Text("Solde disponible - ${devise.code} - ${devise.nom}", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
               const SizedBox(height: 16),
               Row(children: [
                 Expanded(child: FilledButton.icon(onPressed: () => _showRecharge(context), icon: const Icon(Icons.add), label: const Text("Recharger"))),
@@ -946,7 +946,7 @@ class HistoriquePassager extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const Text("Historique des courses", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
-        Text("${historiqueMock.length} courses â€¢ Douala", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+        Text("${historiqueMock.length} courses - Douala", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
         const SizedBox(height: 12),
         ...historiqueMock.map((c) => Card(
               child: Padding(
@@ -973,9 +973,9 @@ class ProfilPassager extends StatelessWidget {
       const CircleAvatar(radius: 40, backgroundColor: Color(0xFF1A6EBF), child: Icon(Icons.person, size: 40, color: Colors.white)),
       const SizedBox(height: 12),
       const Center(child: Text("Raphaela M.", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18))),
-      Center(child: Text("Passager â€¢ Douala â€¢ Membre depuis Jan 2026", style: TextStyle(color: Colors.grey.shade600, fontSize: 12))),
+      Center(child: Text("Passager - Douala - Membre depuis Jan 2026", style: TextStyle(color: Colors.grey.shade600, fontSize: 12))),
       const SizedBox(height: 16),
-      Card(child: Column(children: [ListTile(leading: const Icon(Icons.phone), title: const Text("TÃ©lÃ©phone"), subtitle: const Text("+237 6 XX XX XX XX (fictif)"), trailing: const Icon(Icons.verified, color: Colors.green)), const Divider(height: 1), ListTile(leading: const Icon(Icons.shield), title: const Text("CrÃ©dit d'urgence"), subtitle: const Text("Ã‰ligible â€¢ Plafond 3000 FCFA"))])),
+      Card(child: Column(children: [ListTile(leading: const Icon(Icons.phone), title: const Text("TÃ©lÃ©phone"), subtitle: const Text("+237 6 XX XX XX XX (fictif)"), trailing: const Icon(Icons.verified, color: Colors.green)), const Divider(height: 1), ListTile(leading: const Icon(Icons.shield), title: const Text("CrÃ©dit d'urgence"), subtitle: const Text("Ã‰ligible - Plafond 3000 FCFA"))])),
       const SizedBox(height: 12),
       Card(child: ListTile(leading: const Icon(Icons.help_outline), title: const Text("Support & SÃ©curitÃ©"), subtitle: const Text("SOS, signalement, assistance 24/7 (simulÃ©)"))),
     ]);
@@ -1035,7 +1035,7 @@ class _ChauffeurRootState extends State<ChauffeurRoot> {
         const SizedBox(height: 12),
         CarteSimulee(hauteur: 200, showCar: true, progression: statutCourse == "enCours" ? 0.6 : 0.2, depart: "Deido", arrivee: "Bonapriso"),
         const SizedBox(height: 12),
-        Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: const Text("Cliente: Marie L.", style: TextStyle(fontWeight: FontWeight.w700)), subtitle: const Text("Deido â†’ Bonapriso â€¢ 2800 FCFA â€¢ Paiement Wallet"))),
+        Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: const Text("Cliente: Marie L.", style: TextStyle(fontWeight: FontWeight.w700)), subtitle: const Text("Deido â†’ Bonapriso - 2800 FCFA - Paiement Wallet"))),
         const SizedBox(height: 12),
         if (statutCourse == "aucune" || statutCourse == "entrante") ...[
           const Card(child: Padding(padding: EdgeInsets.all(16), child: Text("Aucune course en cours. Accepte une course entrante depuis l'onglet DisponibilitÃ©.", style: TextStyle(color: Colors.grey)))),
@@ -1050,7 +1050,7 @@ class _ChauffeurRootState extends State<ChauffeurRoot> {
     }
     if (widget.index == 2) {
       return ListView(padding: const EdgeInsets.all(16), children: [
-        Card(color: const Color(0xFF1A6EBF), child: Padding(padding: const EdgeInsets.all(18), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Gains du mois", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)), Text("${gainsMois.toInt()} FCFA", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 28)), Text("AoÃ»t 2026 â€¢ 34 courses", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11))]))),
+        Card(color: const Color(0xFF1A6EBF), child: Padding(padding: const EdgeInsets.all(18), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("Gains du mois", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)), Text("${gainsMois.toInt()} FCFA", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 28)), Text("AoÃ»t 2026 - 34 courses", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11))]))),
         const SizedBox(height: 12),
         const Text("DÃ©tail des courses", style: TextStyle(fontWeight: FontWeight.w800)),
         const SizedBox(height: 8),
@@ -1065,7 +1065,7 @@ class _ChauffeurRootState extends State<ChauffeurRoot> {
       children: [
         Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("DisponibilitÃ©", style: TextStyle(fontWeight: FontWeight.w800)), Switch(value: enLigne, onChanged: (v) { setState(() { enLigne = v; if (v) { courseEntranteVisible = true; _startCountdown(); } }); }, activeColor: const Color(0xFF2DB872))]),
-          Row(children: [Icon(enLigne ? Icons.circle : Icons.circle_outlined, size: 10, color: enLigne ? Colors.green : Colors.grey), const SizedBox(width: 6), Text(enLigne ? "En ligne â€¢ Visible pour les passagers" : "Hors ligne â€¢ Invisible", style: TextStyle(color: enLigne ? Colors.green.shade700 : Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 12))]),
+          Row(children: [Icon(enLigne ? Icons.circle : Icons.circle_outlined, size: 10, color: enLigne ? Colors.green : Colors.grey), const SizedBox(width: 6), Text(enLigne ? "En ligne - Visible pour les passagers" : "Hors ligne - Invisible", style: TextStyle(color: enLigne ? Colors.green.shade700 : Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 12))]),
           const SizedBox(height: 12),
           Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF6F9FC), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)), child: Row(children: [const Icon(Icons.schedule, size: 18, color: Color(0xFF1A6EBF)), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text("CrÃ©neau assignÃ©", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)), Text(creneau, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13))]), const Spacer(), DropdownButton<String>(value: creneau, underline: const SizedBox(), items: const [DropdownMenuItem(value: "Jour (06h-18h)", child: Text("Jour")), DropdownMenuItem(value: "Nuit (18h-06h)", child: Text("Nuit"))], onChanged: (v) => setState(() => creneau = v!))]))])),
         ),
@@ -1078,11 +1078,11 @@ class _ChauffeurRootState extends State<ChauffeurRoot> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Row(children: [Icon(Icons.notifications_active, color: Colors.orange.shade800, size: 18), const SizedBox(width: 6), Text("Course entrante !", style: TextStyle(color: Colors.orange.shade900, fontWeight: FontWeight.w900))]), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.orange.shade800, borderRadius: BorderRadius.circular(20)), child: Text("$countdown s", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12)))]),
                 const SizedBox(height: 10),
-                const Text("Passager: Marie L. â€¢ â­ 4.8", style: TextStyle(fontWeight: FontWeight.w700)),
+                const Text("Passager: Marie L. - â­ 4.8", style: TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
-                const Text("Deido â†’ Bonapriso â€¢ 6.2 km â€¢ 18 min", style: TextStyle(fontSize: 12)),
+                const Text("Deido â†’ Bonapriso - 6.2 km - 18 min", style: TextStyle(fontSize: 12)),
                 const SizedBox(height: 4),
-                const Text("Prix: 3200 FCFA â€¢ Paiement Wallet", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF1A6EBF))),
+                const Text("Prix: 3200 FCFA - Paiement Wallet", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF1A6EBF))),
                 const SizedBox(height: 12),
                 LinearProgressIndicator(value: countdown / 15, color: Colors.orange.shade800, backgroundColor: Colors.orange.shade100),
                 const SizedBox(height: 12),
@@ -1113,17 +1113,17 @@ class AdminRoot extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const Text("Chauffeurs", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
-          Text("${chauffeursMock.length} chauffeurs â€¢ Douala", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+          Text("${chauffeursMock.length} chauffeurs - Douala", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
           const SizedBox(height: 12),
           ...chauffeursMock.map((c) => Card(
                 child: ListTile(
                   leading: CircleAvatar(backgroundColor: c.couleurAvatar, child: Icon(c.icone, color: Colors.white, size: 18)),
                   title: Text(c.nom, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                  subtitle: Text("${c.vehicule} â€¢ ${c.plaque} â€¢ ${c.creneau}", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+                  subtitle: Text("${c.vehicule} - ${c.plaque} - ${c.creneau}", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
                   trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
                     Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: c.actif ? Colors.green.shade50 : Colors.grey.shade200, borderRadius: BorderRadius.circular(20), border: Border.all(color: c.actif ? Colors.green.shade200 : Colors.grey.shade300)), child: Text(c.actif ? "Actif" : "Inactif", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: c.actif ? Colors.green.shade700 : Colors.grey.shade600))),
                     const SizedBox(height: 4),
-                    Text("â­ ${c.note} â€¢ ${c.coursesDuJour} courses", style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                    Text("â­ ${c.note} - ${c.coursesDuJour} courses", style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
                   ]),
                 ),
               )),
@@ -1132,10 +1132,10 @@ class AdminRoot extends StatelessWidget {
     }
     if (index == 2) {
       final alertes = [
-        {"titre": "Ã‰cart kilomÃ©trique dÃ©tectÃ©", "desc": "VÃ©hicule 3 â€¢ LT 3421 CE â€¢ +4.2 km vs trajet optimal", "time": "Il y a 12 min", "color": Colors.orange},
-        {"titre": "SOS passager", "desc": "Course #VTC-8891 â€¢ Bonapriso â€¢ Intervention en cours", "time": "Il y a 34 min", "color": Colors.red},
-        {"titre": "Paiement Ã©chouÃ©", "desc": "Wallet insuffisant â€¢ Passager A. â€¢ CrÃ©dit d'urgence proposÃ©", "time": "Il y a 1h", "color": Colors.blue},
-        {"titre": "Chauffeur hors zone", "desc": "Emmanuel T. â€¢ Sortie de Douala signalÃ©e", "time": "Il y a 2h", "color": Colors.purple},
+        {"titre": "Ã‰cart kilomÃ©trique dÃ©tectÃ©", "desc": "VÃ©hicule 3 - LT 3421 CE - +4.2 km vs trajet optimal", "time": "Il y a 12 min", "color": Colors.orange},
+        {"titre": "SOS passager", "desc": "Course #VTC-8891 - Bonapriso - Intervention en cours", "time": "Il y a 34 min", "color": Colors.red},
+        {"titre": "Paiement Ã©chouÃ©", "desc": "Wallet insuffisant - Passager A. - CrÃ©dit d'urgence proposÃ©", "time": "Il y a 1h", "color": Colors.blue},
+        {"titre": "Chauffeur hors zone", "desc": "Emmanuel T. - Sortie de Douala signalÃ©e", "time": "Il y a 2h", "color": Colors.purple},
       ];
       return ListView(
         padding: const EdgeInsets.all(16),
@@ -1158,8 +1158,8 @@ class AdminRoot extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text("Tableau de bord â€¢ Douala", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
-        Text("20 AoÃ»t 2026 â€¢ DonnÃ©es fictives temps rÃ©el (simulÃ©)", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
+        const Text("Tableau de bord - Douala", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+        Text("20 AoÃ»t 2026 - DonnÃ©es fictives temps rÃ©el (simulÃ©)", style: TextStyle(color: Colors.grey.shade600, fontSize: 11)),
         const SizedBox(height: 12),
         GridView.count(
           crossAxisCount: 2,
@@ -1182,7 +1182,7 @@ class AdminRoot extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text("RÃ©partition par crÃ©neau", style: TextStyle(fontWeight: FontWeight.w800)),
               const SizedBox(height: 12),
-              Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF2DB872), shape: BoxShape.circle)), const SizedBox(width: 6), const Text("Jour", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]), const SizedBox(height: 4), Text("14 chauffeurs â€¢ 82 courses", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))])), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF1A6EBF), shape: BoxShape.circle)), const SizedBox(width: 6), const Text("Nuit", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]), const SizedBox(height: 4), Text("10 chauffeurs â€¢ 45 courses", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))]))]),
+              Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF2DB872), shape: BoxShape.circle)), const SizedBox(width: 6), const Text("Jour", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]), const SizedBox(height: 4), Text("14 chauffeurs - 82 courses", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))])), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF1A6EBF), shape: BoxShape.circle)), const SizedBox(width: 6), const Text("Nuit", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12))]), const SizedBox(height: 4), Text("10 chauffeurs - 45 courses", style: TextStyle(color: Colors.grey.shade600, fontSize: 11))]))]),
               const SizedBox(height: 12),
               ClipRRect(borderRadius: BorderRadius.circular(99), child: LinearProgressIndicator(value: 0.65, minHeight: 8, backgroundColor: const Color(0xFF1A6EBF), color: const Color(0xFF2DB872))),
             ]),
@@ -1266,7 +1266,7 @@ class CarteSimulee extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.grey.shade300)),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.map, size: 12, color: Colors.grey.shade700), const SizedBox(width: 4), Text("Carte simulÃ©e â€¢ Douala (dÃ©mo)", style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w600))]),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.map, size: 12, color: Colors.grey.shade700), const SizedBox(width: 4), Text("Carte simulÃ©e - Douala (dÃ©mo)", style: TextStyle(fontSize: 9, color: Colors.grey.shade700, fontWeight: FontWeight.w600))]),
               ),
             ),
             Positioned(
@@ -1335,5 +1335,6 @@ class _RoutePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RoutePainter oldDelegate) => oldDelegate.progression != progression;
 }
+
 
 

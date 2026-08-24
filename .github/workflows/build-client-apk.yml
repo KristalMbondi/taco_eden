@@ -1,4 +1,4 @@
-name: Build Client APK
+﻿name: Build Client APK
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
           cache: true
       - working-directory: apps/client
         run: |
-          if [ ! -d android ]; then flutter create . --platforms=android; else echo "android exists - skip create"; fi
+          flutter create . --platforms=android --overwrite
           flutter pub get
           flutter analyze || echo "warnings ok"
           flutter build apk --release
@@ -32,3 +32,6 @@ jobs:
         with:
           name: taco-eden-client-apk
           path: apps/client/build/app/outputs/flutter-apk/app-release.apk
+
+
+
