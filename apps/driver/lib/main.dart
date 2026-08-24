@@ -1,5 +1,5 @@
 ﻿// ============================================================
-// TACO EDEN - MVP Maquette Fonctionnelle - Douala, Cameroun
+// EDEN MOBILITY - MVP Maquette Fonctionnelle - Douala, Cameroun
 // 100% Mock Data - Aucun serveur, aucune API externe
 // Un seul fichier main.dart - Flutter SDK seul
 // Commentaires en franÃ§ais - Material 3
@@ -130,7 +130,7 @@ class VTCAfriqueApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TACO EDEN - Chauffeur',
+      title: 'EDEN MOBILITY - Chauffeur',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -183,7 +183,7 @@ class _RacineAppState extends State<RacineApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("TACO EDEN • Chauffeur", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16))),
+      appBar: AppBar(title: const Text("EDEN MOBILITY • Chauffeur", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16))),
       body: ChauffeurRoot(index: indexChauffeur),
       bottomNavigationBar: NavigationBar(selectedIndex: indexChauffeur, onDestinationSelected: (i) => setState(() => indexChauffeur = i), destinations: const [NavigationDestination(icon: Icon(Icons.toggle_on_outlined), selectedIcon: Icon(Icons.toggle_on), label: "Disponibilité"), NavigationDestination(icon: Icon(Icons.route), selectedIcon: Icon(Icons.route), label: "Course"), NavigationDestination(icon: Icon(Icons.payments_outlined), selectedIcon: Icon(Icons.payments), label: "Gains")]),
     );
@@ -322,7 +322,7 @@ class _PassagerRootState extends State<PassagerRoot> {
           arrivee: destination,
           chauffeur: chauffeurActuel,
           progression: progressionSuivi,
-          onSOS: () => showDialog(context: context, builder: (_) => AlertDialog(title: const Text("SOS - Urgence"), content: const Text("Signal envoye au centre de securite TACO EDEN Douala.\nUn operateur te rappelle dans 60 secondes.\nPosition partagee: Akwa - Bonapriso."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))])),
+          onSOS: () => showDialog(context: context, builder: (_) => AlertDialog(title: const Text("SOS - Urgence"), content: const Text("Signal envoye au centre de securite EDEN MOBILITY Douala.\nUn operateur te rappelle dans 60 secondes.\nPosition partagee: Akwa - Bonapriso."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))])),
           onArriveeForcee: () {
             timerSuivi?.cancel();
             setState(() => etape = EtapePassager.fin);
@@ -555,7 +555,7 @@ class EcranWalletCheck extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [Icon(Icons.shield, color: Colors.orange.shade800), const SizedBox(width: 8), Expanded(child: Text("Credit d'urgence disponible", style: TextStyle(color: Colors.orange.shade900, fontWeight: FontWeight.w800)))]),
                 const SizedBox(height: 8),
-                Text("Solde insuffisant (${formatMontant(solde)} < ${formatMontant(prixTotal)}), mais tu es eligible au credit d'urgence TACO EDEN (client fidÃ¨le).", style: TextStyle(color: Colors.orange.shade900, fontSize: 12)),
+                Text("Solde insuffisant (${formatMontant(solde)} < ${formatMontant(prixTotal)}), mais tu es eligible au credit d'urgence EDEN MOBILITY (client fidÃ¨le).", style: TextStyle(color: Colors.orange.shade900, fontSize: 12)),
                 const SizedBox(height: 6),
                 Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.orange.shade200)), child: Row(children: [Icon(Icons.info, size: 14, color: Colors.orange.shade700), const SizedBox(width: 6), Expanded(child: Text("Frais: 1200 FCFA rembourses Ã  la prochaine recharge. Course lancee immediatement.", style: TextStyle(fontSize: 11, color: Colors.orange.shade800)))])),
                 const SizedBox(height: 12),
@@ -673,7 +673,7 @@ class EcranFinCourse extends StatelessWidget {
         const Icon(Icons.check_circle, color: Colors.green, size: 56),
         const SizedBox(height: 8),
         const Center(child: Text("Course terminee !", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22))),
-        Center(child: Text("Merci d'avoir voyage avec TACO EDEN", style: TextStyle(color: Colors.grey.shade600))),
+        Center(child: Text("Merci d'avoir voyage avec EDEN MOBILITY", style: TextStyle(color: Colors.grey.shade600))),
         const SizedBox(height: 16),
         Card(
           child: Padding(
@@ -736,7 +736,7 @@ class WalletPassager extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Wallet TACO EDEN", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)), Icon(Icons.visibility, color: Colors.white.withOpacity(0.8), size: 18)]),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Wallet EDEN MOBILITY", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)), Icon(Icons.visibility, color: Colors.white.withOpacity(0.8), size: 18)]),
               const SizedBox(height: 8),
               Text(formatMontant(soldeFCFA), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 30)),
               Text("Solde disponible - ${devise.code} - ${devise.nom}", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
@@ -1194,6 +1194,7 @@ class _RoutePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RoutePainter oldDelegate) => oldDelegate.progression != progression;
 }
+
 
 
 

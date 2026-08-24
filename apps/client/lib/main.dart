@@ -1,5 +1,5 @@
 ﻿// ============================================================
-// TACO EDEN - MVP Maquette Fonctionnelle - Douala, Cameroun
+// EDEN MOBILITY - MVP Maquette Fonctionnelle - Douala, Cameroun
 // 100% Mock Data - Aucun serveur, aucune API externe
 // Un seul fichier main.dart - Flutter SDK seul
 // Commentaires en franÃ§ais - Material 3
@@ -130,7 +130,7 @@ class VTCAfriqueApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TACO EDEN - Client',
+      title: 'EDEN MOBILITY - Client',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -178,18 +178,12 @@ class RacineApp extends StatefulWidget {
 
 class _RacineAppState extends State<RacineApp> {
   bool isLoggedIn = false;
-  bool showSplash = true;
   final TextEditingController userCtrl = TextEditingController();
   final TextEditingController passCtrl = TextEditingController();
   String loginError = "";
   int indexPassager = 0;
   int soldeFCFA = 4200;
   DeviseMock deviseSelectionnee = devisesMock[0];
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(milliseconds: 1400), () { if (mounted) setState(() => showSplash = false); });
-  }
   @override
   void dispose() { userCtrl.dispose(); passCtrl.dispose(); super.dispose(); }
   String formatMontant(int m) {
@@ -208,13 +202,10 @@ class _RacineAppState extends State<RacineApp> {
   }
   @override
   Widget build(BuildContext context) {
-    if (showSplash) {
-      return Scaffold(backgroundColor: const Color(0xFFF6F9FC), body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1A6EBF), Color(0xFF2DB872)]), borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: const Color(0xFF1A6EBF).withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))]), child: const Icon(Icons.directions_car, size: 48, color: Colors.white)), const SizedBox(height: 20), const Text("TACO EDEN", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28, letterSpacing: 1.2, color: Color(0xFF1A6EBF))), const Text("MOBILITY  -  Douala", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, letterSpacing: 2, color: Color(0xFF2DB872))), const SizedBox(height: 8), Text("ET PUIS QUOI ENCORE ?", style: TextStyle(color: Colors.grey.shade500, fontSize: 11, letterSpacing: 1)), const SizedBox(height: 24), const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2DB872)))])));
-    }
     if (!isLoggedIn) {
-      return Scaffold(backgroundColor: const Color(0xFFF6F9FC), body: SafeArea(child: ListView(padding: const EdgeInsets.all(24), children: [const SizedBox(height: 30), Center(child: Column(children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1A6EBF), Color(0xFF2DB872)]), borderRadius: BorderRadius.circular(20)), child: const Icon(Icons.directions_car, size: 40, color: Colors.white)), const SizedBox(height: 14), const Text("TACO EDEN", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24, color: Color(0xFF1A6EBF))), const Text("MOBILITY", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 3, color: Color(0xFF2DB872)))])), const SizedBox(height: 32), Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text("Connexion Passager", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)), const SizedBox(height: 4), Text("Demo - Utilise Kristal / 123456", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), const SizedBox(height: 18), TextField(controller: userCtrl, decoration: InputDecoration(labelText: "Nom d'utilisateur", hintText: "Kristal", prefixIcon: const Icon(Icons.person), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))), const SizedBox(height: 14), TextField(controller: passCtrl, obscureText: true, decoration: InputDecoration(labelText: "Mot de passe", hintText: "123456", prefixIcon: const Icon(Icons.lock), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))), if (loginError.isNotEmpty) ...[const SizedBox(height: 10), Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red.shade200)), child: Row(children: [Icon(Icons.error, size: 16, color: Colors.red.shade700), const SizedBox(width: 6), Expanded(child: Text(loginError, style: TextStyle(color: Colors.red.shade700, fontSize: 12))) ]))], const SizedBox(height: 18), SizedBox(width: double.infinity, child: FilledButton(onPressed: tryLogin, child: const Text("Se connecter"))), const SizedBox(height: 8), Center(child: TextButton(onPressed: () { userCtrl.text = "Kristal"; passCtrl.text = "123456"; tryLogin(); }, child: const Text("Remplir automatiquement")))])))]))));
+      return Scaffold(backgroundColor: const Color(0xFFF6F9FC), body: SafeArea(child: ListView(padding: const EdgeInsets.all(24), children: [const SizedBox(height: 30), Center(child: Column(children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1A6EBF), Color(0xFF2DB872)]), borderRadius: BorderRadius.circular(20)), child: const Icon(Icons.directions_car, size: 40, color: Colors.white)), const SizedBox(height: 14), const Text("EDEN MOBILITY", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24, color: Color(0xFF1A6EBF))), const Text("MOBILITY", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 3, color: Color(0xFF2DB872)))])), const SizedBox(height: 32), Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text("Connexion Passager", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)), const SizedBox(height: 4), Text("Demo - Utilise Kristal / 123456", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), const SizedBox(height: 18), TextField(controller: userCtrl, decoration: InputDecoration(labelText: "Nom d'utilisateur", hintText: "Kristal", prefixIcon: const Icon(Icons.person), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))), const SizedBox(height: 14), TextField(controller: passCtrl, obscureText: true, decoration: InputDecoration(labelText: "Mot de passe", hintText: "123456", prefixIcon: const Icon(Icons.lock), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))), if (loginError.isNotEmpty) ...[const SizedBox(height: 10), Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red.shade200)), child: Row(children: [Icon(Icons.error, size: 16, color: Colors.red.shade700), const SizedBox(width: 6), Expanded(child: Text(loginError, style: TextStyle(color: Colors.red.shade700, fontSize: 12))) ]))], const SizedBox(height: 18), SizedBox(width: double.infinity, child: FilledButton(onPressed: tryLogin, child: const Text("Se connecter"))), const SizedBox(height: 8), Center(child: TextButton(onPressed: () { userCtrl.text = "Kristal"; passCtrl.text = "123456"; tryLogin(); }, child: const Text("Remplir automatiquement")))])))]))));
     }
-    return Scaffold(appBar: AppBar(title: const Text("TACO EDEN - Client", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)), actions: [IconButton(onPressed: () => setState(() { isLoggedIn = false; indexPassager = 0; }), icon: const Icon(Icons.logout), tooltip: "Deconnexion")]), body: PassagerRoot(index: indexPassager, soldeFCFA: soldeFCFA, devise: deviseSelectionnee, onDeviseChange: (d) => setState(() => deviseSelectionnee = d), formatMontant: formatMontant, onSoldeChange: (delta) { if (delta > 0) ajouterSolde(delta); else debiterSolde(-delta); }), bottomNavigationBar: NavigationBar(selectedIndex: indexPassager, onDestinationSelected: (i) => setState(() => indexPassager = i), destinations: const [NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: "Accueil"), NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: "Wallet"), NavigationDestination(icon: Icon(Icons.history), selectedIcon: Icon(Icons.history), label: "Historique"), NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: "Profil")]));
+    return Scaffold(appBar: AppBar(title: const Text("EDEN MOBILITY - Client", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)), actions: [IconButton(onPressed: () => setState(() { isLoggedIn = false; indexPassager = 0; }), icon: const Icon(Icons.logout), tooltip: "Deconnexion")]), body: PassagerRoot(index: indexPassager, soldeFCFA: soldeFCFA, devise: deviseSelectionnee, onDeviseChange: (d) => setState(() => deviseSelectionnee = d), formatMontant: formatMontant, onSoldeChange: (delta) { if (delta > 0) ajouterSolde(delta); else debiterSolde(-delta); }), bottomNavigationBar: NavigationBar(selectedIndex: indexPassager, onDestinationSelected: (i) => setState(() => indexPassager = i), destinations: const [NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: "Accueil"), NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: "Wallet"), NavigationDestination(icon: Icon(Icons.history), selectedIcon: Icon(Icons.history), label: "Historique"), NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: "Profil")]));
   }
 }
 // ============================================================
@@ -351,7 +342,7 @@ class _PassagerRootState extends State<PassagerRoot> {
           arrivee: destination,
           chauffeur: chauffeurActuel,
           progression: progressionSuivi,
-          onSOS: () => showDialog(context: context, builder: (_) => AlertDialog(title: const Text("SOS - Urgence"), content: const Text("Signal envoye au centre de securite TACO EDEN Douala.\nUn operateur te rappelle dans 60 secondes.\nPosition partagee: Akwa - Bonapriso."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))])),
+          onSOS: () => showDialog(context: context, builder: (_) => AlertDialog(title: const Text("SOS - Urgence"), content: const Text("Signal envoye au centre de securite EDEN MOBILITY Douala.\nUn operateur te rappelle dans 60 secondes.\nPosition partagee: Akwa - Bonapriso."), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))])),
           onArriveeForcee: () {
             timerSuivi?.cancel();
             setState(() => etape = EtapePassager.fin);
@@ -583,7 +574,7 @@ class EcranWalletCheck extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [Icon(Icons.shield, color: Colors.orange.shade800), const SizedBox(width: 8), Expanded(child: Text("Credit d'urgence disponible", style: TextStyle(color: Colors.orange.shade900, fontWeight: FontWeight.w800)))]),
                 const SizedBox(height: 8),
-                Text("Solde insuffisant (${formatMontant(solde)} < ${formatMontant(prixTotal)}), mais tu es eligible au credit d'urgence TACO EDEN (client fidele).", style: TextStyle(color: Colors.orange.shade900, fontSize: 12)),
+                Text("Solde insuffisant (${formatMontant(solde)} < ${formatMontant(prixTotal)}), mais tu es eligible au credit d'urgence EDEN MOBILITY (client fidele).", style: TextStyle(color: Colors.orange.shade900, fontSize: 12)),
                 const SizedBox(height: 6),
                 Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.orange.shade200)), child: Row(children: [Icon(Icons.info, size: 14, color: Colors.orange.shade700), const SizedBox(width: 6), Expanded(child: Text("Frais: 1200 FCFA rembourses Ã  la prochaine recharge. Course lancee immediatement.", style: TextStyle(fontSize: 11, color: Colors.orange.shade800)))])),
                 const SizedBox(height: 12),
@@ -701,7 +692,7 @@ class EcranFinCourse extends StatelessWidget {
         const Icon(Icons.check_circle, color: Colors.green, size: 56),
         const SizedBox(height: 8),
         const Center(child: Text("Course terminee !", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22))),
-        Center(child: Text("Merci d'avoir voyage avec TACO EDEN", style: TextStyle(color: Colors.grey.shade600))),
+        Center(child: Text("Merci d'avoir voyage avec EDEN MOBILITY", style: TextStyle(color: Colors.grey.shade600))),
         const SizedBox(height: 16),
         Card(
           child: Padding(
@@ -764,7 +755,7 @@ class WalletPassager extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Wallet TACO EDEN", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)), Icon(Icons.visibility, color: Colors.white.withOpacity(0.8), size: 18)]),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Wallet EDEN MOBILITY", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12, letterSpacing: 1)), Icon(Icons.visibility, color: Colors.white.withOpacity(0.8), size: 18)]),
               const SizedBox(height: 8),
               Text(formatMontant(soldeFCFA), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 30)),
               Text("Solde disponible - ${devise.code} - ${devise.nom}", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11)),
@@ -1232,6 +1223,9 @@ class _RoutePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RoutePainter oldDelegate) => oldDelegate.progression != progression;
 }
+
+
+
 
 
 
