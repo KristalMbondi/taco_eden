@@ -24,7 +24,7 @@ jobs:
           cache: true
       - working-directory: apps/admin_web
         run: |
-          flutter create . --platforms=web
+          if [ ! -d web ]; then flutter create . --platforms=web; else echo "web exists - skip create"; fi
           flutter pub get
           flutter analyze || echo "warnings ok"
           flutter build web --release

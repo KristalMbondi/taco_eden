@@ -24,7 +24,7 @@ jobs:
           cache: true
       - working-directory: apps/client
         run: |
-          flutter create . --platforms=android
+          if [ ! -d android ]; then flutter create . --platforms=android; else echo "android exists - skip create"; fi
           flutter pub get
           flutter analyze || echo "warnings ok"
           flutter build apk --release
