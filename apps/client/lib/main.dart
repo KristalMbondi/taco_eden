@@ -167,10 +167,8 @@ class VTCAfriqueApp extends StatelessWidget {
 }
 
 // ============================================================
-// SECTION 4 - RACINE AVEC SELECTEUR DE ROLE + BOTTOM NAV
+// SECTION 4 - RACINE CLIENT DEDIEE + LOGIN (sans menu chauffeur/admin)
 // ============================================================
-
-enum RoleApp { passager, chauffeur, admin }
 
 class RacineApp extends StatefulWidget {
   const RacineApp({super.key});
@@ -179,146 +177,46 @@ class RacineApp extends StatefulWidget {
 }
 
 class _RacineAppState extends State<RacineApp> {
-  RoleApp role = RoleApp.passager;
+  bool isLoggedIn = false;
+  bool showSplash = true;
+  final TextEditingController userCtrl = TextEditingController();
+  final TextEditingController passCtrl = TextEditingController();
+  String loginError = "";
   int indexPassager = 0;
-  int indexChauffeur = 0;
-  int indexAdmin = 0;
-
-  // Etat global wallet (partagÃ© pour la dÃ©mo)
   int soldeFCFA = 4200;
   DeviseMock deviseSelectionnee = devisesMock[0];
-
-  // Conversion simulÃ©e
-  String formatMontant(int montantFCFA) {
-    double taux = deviseSelectionnee.tauxVersFCFA;
-    if (deviseSelectionnee.code == "FCFA") return "$montantFCFA ${deviseSelectionnee.symbole}";
-    double converti = montantFCFA * taux;
-    if (deviseSelectionnee.code == "NGN") return "â‚¦${converti.toStringAsFixed(0)}";
-    if (deviseSelectionnee.code == "GHS") return "GHâ‚µ${converti.toStringAsFixed(2)}";
-    return "${converti.toStringAsFixed(0)} ${deviseSelectionnee.code}";
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 1400), () { if (mounted) setState(() => showSplash = false); });
   }
-
-  void ajouterSolde(int montant) {
-    setState(() => soldeFCFA += montant);
+  @override
+  void dispose() { userCtrl.dispose(); passCtrl.dispose(); super.dispose(); }
+  String formatMontant(int m) {
+    double t = deviseSelectionnee.tauxVersFCFA;
+    if (deviseSelectionnee.code == "FCFA") return "$m ${deviseSelectionnee.symbole}";
+    double c = m * t;
+    if (deviseSelectionnee.code == "NGN") return "â‚¦${c.toStringAsFixed(0)}";
+    if (deviseSelectionnee.code == "GHS") return "GHâ‚µ${c.toStringAsFixed(2)}";
+    return "${c.toStringAsFixed(0)} ${deviseSelectionnee.code}";
   }
-
-  void debiterSolde(int montant) {
-    setState(() => soldeFCFA -= montant);
+  void ajouterSolde(int v) => setState(() => soldeFCFA += v);
+  void debiterSolde(int v) => setState(() => soldeFCFA -= v);
+  void tryLogin() {
+    if (userCtrl.text.trim() == "Kristal" && passCtrl.text == "123456") { setState(() { isLoggedIn = true; loginError = ""; }); }
+    else { setState(() => loginError = "Identifiants incorrects. Utilise Kristal / 123456"); }
   }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // Barre haute avec sÃ©lecteur de rÃ´le (exigence)
-      appBar: AppBar(
-        title: const Text("TACO EDEN â€¢ Douala", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(62),
-          child: Container(
-            color: const Color(0xFF1A6EBF),
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: Container(
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
-              child: Row(
-                children: [
-                  _buildRoleChip("Passager", Icons.person, RoleApp.passager),
-                  _buildRoleChip("Chauffeur", Icons.local_taxi, RoleApp.chauffeur),
-                  _buildRoleChip("Admin", Icons.admin_panel_settings, RoleApp.admin),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      body: _buildBody(),
-      bottomNavigationBar: _buildBottomNav(),
-    );
-  }
-
-  Widget _buildRoleChip(String label, IconData icon, RoleApp r) {
-    final selected = role == r;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => role = r),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          margin: const EdgeInsets.all(4),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: selected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 16, color: selected ? const Color(0xFF1A6EBF) : Colors.white70),
-              const SizedBox(width: 6),
-              Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: selected ? const Color(0xFF1A6EBF) : Colors.white70)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    switch (role) {
-      case RoleApp.passager:
-        return PassagerRoot(
-          index: indexPassager,
-          soldeFCFA: soldeFCFA,
-          devise: deviseSelectionnee,
-          onDeviseChange: (d) => setState(() => deviseSelectionnee = d),
-          formatMontant: formatMontant,
-          onSoldeChange: (delta) {
-            if (delta > 0) ajouterSolde(delta);
-            else debiterSolde(-delta);
-          },
-        );
-      case RoleApp.chauffeur:
-        return ChauffeurRoot(index: indexChauffeur);
-      case RoleApp.admin:
-        return AdminRoot(index: indexAdmin);
+    if (showSplash) {
+      return Scaffold(backgroundColor: const Color(0xFFF6F9FC), body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1A6EBF), Color(0xFF2DB872)]), borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: const Color(0xFF1A6EBF).withOpacity(0.25), blurRadius: 20, offset: const Offset(0, 8))]), child: const Icon(Icons.directions_car, size: 48, color: Colors.white)), const SizedBox(height: 20), const Text("TACO EDEN", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 28, letterSpacing: 1.2, color: Color(0xFF1A6EBF))), const Text("MOBILITY  â€¢  Douala", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, letterSpacing: 2, color: Color(0xFF2DB872))), const SizedBox(height: 8), Text("ET PUIS QUOI ENCORE ?", style: TextStyle(color: Colors.grey.shade500, fontSize: 11, letterSpacing: 1)), const SizedBox(height: 24), const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2DB872)))])));
     }
-  }
-
-  Widget? _buildBottomNav() {
-    switch (role) {
-      case RoleApp.passager:
-        return NavigationBar(
-          selectedIndex: indexPassager,
-          onDestinationSelected: (i) => setState(() => indexPassager = i),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: "Accueil"),
-            NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: "Wallet"),
-            NavigationDestination(icon: Icon(Icons.history), selectedIcon: Icon(Icons.history), label: "Historique"),
-            NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: "Profil"),
-          ],
-        );
-      case RoleApp.chauffeur:
-        return NavigationBar(
-          selectedIndex: indexChauffeur,
-          onDestinationSelected: (i) => setState(() => indexChauffeur = i),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.toggle_on_outlined), selectedIcon: Icon(Icons.toggle_on), label: "DisponibilitÃ©"),
-            NavigationDestination(icon: Icon(Icons.route), selectedIcon: Icon(Icons.route), label: "Course"),
-            NavigationDestination(icon: Icon(Icons.payments_outlined), selectedIcon: Icon(Icons.payments), label: "Gains"),
-          ],
-        );
-      case RoleApp.admin:
-        return NavigationBar(
-          selectedIndex: indexAdmin,
-          onDestinationSelected: (i) => setState(() => indexAdmin = i),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: "Dashboard"),
-            NavigationDestination(icon: Icon(Icons.groups_outlined), selectedIcon: Icon(Icons.groups), label: "Chauffeurs"),
-            NavigationDestination(icon: Icon(Icons.warning_amber_outlined), selectedIcon: Icon(Icons.warning), label: "Alertes"),
-          ],
-        );
+    if (!isLoggedIn) {
+      return Scaffold(backgroundColor: const Color(0xFFF6F9FC), body: SafeArea(child: ListView(padding: const EdgeInsets.all(24), children: [const SizedBox(height: 30), Center(child: Column(children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF1A6EBF), Color(0xFF2DB872)]), borderRadius: BorderRadius.circular(20)), child: const Icon(Icons.directions_car, size: 40, color: Colors.white)), const SizedBox(height: 14), const Text("TACO EDEN", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 24, color: Color(0xFF1A6EBF))), const Text("MOBILITY", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 3, color: Color(0xFF2DB872)))])), const SizedBox(height: 32), Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text("Connexion Passager", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)), const SizedBox(height: 4), Text("DÃ©mo â€¢ Utilise Kristal / 123456", style: TextStyle(color: Colors.grey.shade600, fontSize: 12)), const SizedBox(height: 18), TextField(controller: userCtrl, decoration: InputDecoration(labelText: "Nom d'utilisateur", hintText: "Kristal", prefixIcon: const Icon(Icons.person), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))), const SizedBox(height: 14), TextField(controller: passCtrl, obscureText: true, decoration: InputDecoration(labelText: "Mot de passe", hintText: "123456", prefixIcon: const Icon(Icons.lock), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))), if (loginError.isNotEmpty) ...[const SizedBox(height: 10), Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red.shade200)), child: Row(children: [Icon(Icons.error, size: 16, color: Colors.red.shade700), const SizedBox(width: 6), Expanded(child: Text(loginError, style: TextStyle(color: Colors.red.shade700, fontSize: 12))) ]))], const SizedBox(height: 18), SizedBox(width: double.infinity, child: FilledButton(onPressed: tryLogin, child: const Text("Se connecter"))), const SizedBox(height: 8), Center(child: TextButton(onPressed: () { userCtrl.text = "Kristal"; passCtrl.text = "123456"; tryLogin(); }, child: const Text("Remplir automatiquement")))])))]))));
     }
+    return Scaffold(appBar: AppBar(title: const Text("TACO EDEN â€¢ Client", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)), actions: [IconButton(onPressed: () => setState(() { isLoggedIn = false; indexPassager = 0; }), icon: const Icon(Icons.logout), tooltip: "DÃ©connexion")]), body: PassagerRoot(index: indexPassager, soldeFCFA: soldeFCFA, devise: deviseSelectionnee, onDeviseChange: (d) => setState(() => deviseSelectionnee = d), formatMontant: formatMontant, onSoldeChange: (delta) { if (delta > 0) ajouterSolde(delta); else debiterSolde(-delta); }), bottomNavigationBar: NavigationBar(selectedIndex: indexPassager, onDestinationSelected: (i) => setState(() => indexPassager = i), destinations: const [NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: "Accueil"), NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: "Wallet"), NavigationDestination(icon: Icon(Icons.history), selectedIcon: Icon(Icons.history), label: "Historique"), NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: "Profil")]));
   }
 }
-
 // ============================================================
 // SECTION 5 - MODE PASSAGER (PRIORITAIRE ET LE PLUS DETAILLE)
 // ============================================================
@@ -515,7 +413,6 @@ class EcranAccueilPassager extends StatelessWidget {
               const SizedBox(height: 16),
               SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: () => onCommander(destCtrl.text), icon: const Icon(Icons.bolt), label: const Text("Commander maintenant"))),
               const SizedBox(height: 8),
-              Center(child: Text("Estimation instantanÃ©e â€¢ Paiement Mobile Money", style: TextStyle(fontSize: 11, color: Colors.grey.shade600))),
             ]),
           ),
         ),
@@ -1335,4 +1232,6 @@ class _RoutePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RoutePainter oldDelegate) => oldDelegate.progression != progression;
 }
+
+
 
